@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Travel Restaurant | Realm Portal & Ordering Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050508;
+            --surface: #0f0f14;
+            --surface-glass: rgba(15, 15, 20, 0.95);
+            --primary-red: #ff1e3c;
+            --primary-glow: rgba(255, 30, 60, 0.6);
+            --accent-dark-red: #8b0000;
+            --text-main: #f0f0f5;
+            --text-muted: #9494a0;
+            --border-glow: 0 0 15px rgba(255, 30, 60, 0.4);
+            --success-green: #10b981;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% 10%, rgba(139, 0, 0, 0.25) 0%, transparent 40%),
+                linear-gradient(rgba(5, 5, 8, 0.92), rgba(5, 5, 8, 0.92)),
+                repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255, 30, 60, 0.025) 40px, rgba(255, 30, 60, 0.025) 41px);
+            padding-top: 90px;
+        }
+
+        /* Portal Header & Navigation Bar */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 50;
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid var(--primary-red);
+            background: var(--surface-glass);
+            box-shadow: var(--border-glow);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .portal-emblem {
+            width: 36px;
+            height: 48px;
+            object-fit: contain;
+        }
+
+        .brand-title h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: #fff;
+            text-shadow: 0 0 8px var(--primary-red);
+            font-size: 1rem;
+        }
+
+        .brand-title p {
+            font-size: 0.65rem;
+            color: #c0c0d0;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        /* Header Actions */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        button, .btn {
+            background: linear-gradient(135deg, var(--primary-red), var(--accent-dark-red));
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            transition: 0.2s;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(255, 30, 60, 0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        button:hover, .btn:hover {
+            filter: brightness(1.2);
+            box-shadow: 0 0 18px var(--primary-red);
+        }
+
+        button:disabled, .btn:disabled {
+            background: #2a2a36;
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+            filter: none;
+        }
+
+        @keyframes badgePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); background-color: #fff; color: var(--primary-red); box-shadow: 0 0 15px var(--primary-red); }
+            100% { transform: scale(1); }
+        }
+        .pulse-badge {
+            animation: badgePulse 0.4s ease-in-out;
+        }
+
+        .flying-item {
+            position: fixed;
+            z-index: 9999;
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--primary-red);
+            box-shadow: 0 0 15px var(--primary-red);
+            pointer-events: none;
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* Main Container Layout */
+        .container {
+            max-width: 1350px;
+            margin: 20px auto;
+            padding: 0 15px;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .container { 
+                grid-template-columns: 1fr; 
+                padding: 0 10px;
+            }
+            body {
+                padding-top: 80px;
+            }
+        }
+
+        /* Section Titles & Categories */
+        .section-header {
+            background: var(--surface);
+            border: 1px solid #2a080c;
+            padding: 14px 16px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-shadow: 0 0 6px var(--primary-glow);
+        }
+
+        .category-filters {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .cat-btn {
+            background: #12121a;
+            border: 1px solid #2a080c;
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+
+        .cat-btn.active, .cat-btn:hover {
+            background: var(--primary-red);
+            color: #fff;
+            border-color: var(--primary-red);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        /* Menu Cards Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        @media (max-width: 480px) {
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid #2a080c;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary-red);
+            box-shadow: 0 6px 20px rgba(255, 30, 60, 0.25);
+        }
+
+        .card.unavailable {
+            opacity: 0.7;
+            border-color: #3a151b;
+        }
+
+        .card-img-wrapper {
+            position: relative;
+            height: 150px;
+            background: #050508;
+            overflow: hidden;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s;
+        }
+
+        .price-tag {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(5, 5, 8, 0.85);
+            backdrop-filter: blur(4px);
+            border: 1px solid #2a080c;
+            color: var(--primary-red);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+
+        .availability-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            backdrop-filter: blur(4px);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .badge-available { background: rgba(16, 185, 129, 0.85); color: #fff; border: 1px solid #059669; }
+        .badge-unavailable { background: rgba(225, 29, 72, 0.85); color: #fff; border: 1px solid #9f1239; }
+
+        .card-body {
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .card-body h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .card-body p {
+            font-size: 0.8rem;
+            color: #ffffff;
+            line-height: 1.35;
+        }
+
+        /* Sidebar Checkout & Forms */
+        .sidebar-panel {
+            background: var(--surface);
+            border: 1px solid #2a080c;
+            border-radius: 14px;
+            padding: 18px;
+            position: sticky;
+            top: 85px;
+            box-shadow: inset 0 0 15px rgba(139, 0, 0, 0.15);
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar-panel {
+                position: relative;
+                top: 0;
+                margin-top: 20px;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            letter-spacing: 1px;
+        }
+
+        .form-control {
+            width: 100%;
+            background: #12121a;
+            border: 1px solid #2a080c;
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem; /* Prevents iOS auto-zoom on input focus */
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 8px var(--primary-glow);
+        }
+
+        select.form-control { cursor: pointer; }
+
+        /* Cart Drawer & Summary Totals */
+        .summary-box {
+            border-top: 1px solid #2a080c;
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 900;
+            color: #fff;
+            border-top: 1px dashed #2a080c;
+            padding-top: 8px;
+            margin-top: 4px;
+        }
+        .summary-total span:last-child { color: var(--primary-red); }
+
+        /* Modals & Popups */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 5, 8, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border: 1px solid #2a080c;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 440px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), var(--border-glow);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.4rem;
+            cursor: pointer;
+            box-shadow: none;
+            padding: 0;
+            width: auto;
+        }
+        .close-modal:hover { color: #fff; box-shadow: none; filter: none; }
+
+        .cart-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #12121a;
+            border: 1px solid #2a080c;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            gap: 8px;
+        }
+
+        .qty-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .qty-btn {
+            background: #1e1e2d;
+            border: none;
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: none;
+            padding: 0;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .qty-btn:hover { background: var(--primary-red); box-shadow: none; }
+
+        .loading-state, .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 30px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Header -->
+    <header>
+        <div class="brand-container">
+            <img src="crystal-emblem.png" alt="Realm Portal Crystal" class="portal-emblem" title="Realm Portal">
+            <div class="brand-title">
+                <h1>FAST TRAVEL RESTAURANT</h1>
+                <p>Quest Complete It's Time To Eat</p>
+            </div>
+        </div>
+        
+        <div class="header-actions">
+            <button id="cart-btn-target" onclick="openCartDrawer()" class="btn">
+                <span>🛒 Cart</span>
+                <span id="cart-badge" style="background:#fff; color:var(--primary-red); padding: 1px 6px; border-radius:10px; font-size:0.75rem;">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <div class="container">
+        
+        <!-- Menu Realm Section -->
+        <main>
+            <div class="section-header">
+                <h2 class="section-title"><span>📜</span><span>The Menu</span></h2>
+                <div class="category-filters" id="category-filters">
+                    <button onclick="filterMenu('all')" class="cat-btn active">All</button>
+                </div>
+            </div>
+
+            <div id="menu-grid" class="menu-grid">
+                <div class="loading-state">Opening dimensional rift to retrieve menu items...</div>
+            </div>
+        </main>
+
+        <!-- Quick Checkout Sidebar -->
+        <aside>
+            <div class="sidebar-panel">
+                <h2 class="section-title" style="font-size: 1.05rem; margin-bottom: 14px;"><span>♦️</span><span>Quick Checkout Form</span></h2>
+                
+                <form id="checkout-form" onsubmit="submitOrder(event)">
+                    <div class="form-group">
+                        <label>Full Name *</label>
+                        <input type="text" id="cust-name" required placeholder="e.g. Mario Player" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phone *</label>
+                        <input type="tel" id="cust-phone" required 
+                               placeholder="e.g. 01012345678" 
+                               pattern="^01[0125][0-9]{8}$" 
+                               title="Please enter a valid Egyptian mobile number (e.g., 01012345678)" 
+                               class="form-control" 
+                               oninput="validateEgyptianPhone(this)">
+                        <small id="phone-error" style="color: var(--primary-red); font-size: 0.7rem; display: none; margin-top: 4px;">Invalid Egyptian mobile number format (must start with 010, 011, 012, or 015 and be 11 digits).</small>
+                    </div>
+
+                    <!-- City Selection -->
+                    <div class="form-group">
+                        <label>City *</label>
+                        <select id="cust-city" required class="form-control" onchange="onCityChange()">
+                            <option value="">Loading cities...</option>
+                        </select>
+                    </div>
+
+                    <!-- Area Selection -->
+                    <div class="form-group">
+                        <label>Area *</label>
+                        <select id="cust-area" required class="form-control" disabled onchange="onAreaChange()">
+                            <option value="">-- Select City First --</option>
+                        </select>
+                    </div>
+
+                    <!-- Street Address Text Box -->
+                    <div class="form-group">
+                        <label>Address details *</label>
+                        <input type="text" id="cust-street" required placeholder="Street name, building number, floor..." class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Payment Selection *</label>
+                        <select id="cust-payment" class="form-control">
+                            <option value="Cash on Delivery">Cash on Delivery 💵</option>
+                            <option value="Card on Delivery (POS)">Card on Delivery (POS Machine) 💳</option>
+                        </select>
+                    </div>
+
+                    <div class="summary-box">
+                        <div id="summary-items-list" style="margin-bottom: 10px; font-size: 0.8rem; max-height: 130px; overflow-y: auto; padding-right: 4px;"></div>
+
+                        <div class="summary-row">
+                            <span>Subtotal</span>
+                            <span id="summary-subtotal">0.00 EGP</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Delivery Fee</span>
+                            <span id="summary-delivery">0.00 EGP</span>
+                        </div>
+                        <div class="summary-total">
+                            <span>Total Amount</span>
+                            <span id="summary-total">0.00 EGP</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" style="width:100%; margin-top:14px; padding:12px;">Confirm & Dispatch Order 🍴</button>
+                </form>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Side Selection Modal -->
+    <div id="side-modal" class="modal-overlay" onclick="if(event.target === this) closeSideModal()">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a080c; padding-bottom: 10px; margin-bottom: 14px;">
+                <h3 class="section-title" style="font-size: 1.05rem; margin:0;"><span>🍜</span><span>Customize Item Options</span></h3>
+                <button class="close-modal" onclick="closeSideModal()">&times;</button>
+            </div>
+            <p id="side-modal-item-name" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: bold;"></p>
+            
+            <div id="sides-container">
+                <div class="form-group">
+                    <label>Select Side Option *</label>
+                    <select id="meal-side-choice-1" class="form-control">
+                        <option value="Rice">Rice 🍚</option>
+                        <option value="Pasta">Pasta 🍝</option>
+                        <option value="Fries" selected>Fries 🍟</option>
+                        <option value="Sandwich">Sandwich 🥪</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="flavors-container" style="display: none;">
+                <div class="form-group">
+                    <label>Select Tender Flavor *</label>
+                    <select id="tender-flavor-choice-1" class="form-control">
+                        <option value="كلاسيك">كلاسيك</option>
+                        <option value="أعشاب">أعشاب</option>
+                        <option value="حار">حار</option>
+                        <option value="اناناس مدخن">اناناس مدخن</option>
+                        <option value="كاري">كاري</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="specific-flavor-container" style="display: none;">
+                <div class="form-group">
+                    <label id="specific-flavor-label">Select Option *</label>
+                    <select id="specific-flavor-choice" class="form-control">
+                        <option value="كلاسيك">كلاسيك</option>
+                        <option value="أعشاب">أعشاب</option>
+                        <option value="حار">حار</option>
+                        <option value="اناناس مدخن">اناناس مدخن</option>
+                        <option value="كاري">كاري</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="combo-container" style="display: none;">
+                <div class="form-group">
+                    <label>1- Fries Selection *</label>
+                    <select id="combo-fries-choice" class="form-control">
+                        <option value="كلاسيك">كلاسيك</option>
+                        <option value="أعشاب">أعشاب</option>
+                        <option value="اناناس مدخن">اناناس مدخن</option>
+                        <option value="حار">حار</option>
+                        <option value="كاري">كاري</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>2- Drink Selection *</label>
+                    <select id="combo-drink-choice" class="form-control">
+                        <option value="مشروب V-7 (كولا)">مشروب V-7 (كولا)</option>
+                        <option value="مشروب V-7 (كولا دايت)">مشروب V-7 (كولا دايت)</option>
+                        <option value="مشروب V-7 (ليمون نعناع)">مشروب V-7 (ليمون نعناع)</option>
+                        <option value="مشروب V-7 (ليمون ليم)">مشروب V-7 (ليمون ليم)</option>
+                        <option value="مشروب V-7 (توت)">مشروب V-7 (توت)</option>
+                        <option value="مشروب V-7 (رمان)">مشروب V-7 (رمان)</option>
+                        <option value="مشروب V-7 (بينك ليمونادا)">مشروب V-7 (بينك ليمونادا)</option>
+                        <option value="مشروب V-7 (بينا كولادا)">مشروب V-7 (بينا كولادا)</option>
+                        <option value="مشروب V-7 (تفاح شعير)">مشروب V-7 (تفاح شعير)</option>
+                        <option value="مشروب V-7 (اناناس شعير)">مشروب V-7 (اناناس شعير)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="super-combo-container" style="display: none;">
+                <div class="form-group">
+                    <label>1- Fries Selection *</label>
+                    <select id="super-combo-fries-choice" class="form-control">
+                        <option value="كلاسيك">كلاسيك</option>
+                        <option value="أعشاب">أعشاب</option>
+                        <option value="اناناس مدخن">اناناس مدخن</option>
+                        <option value="حار">حار</option>
+                        <option value="كاري">كاري</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>2- Drink Selection *</label>
+                    <select id="super-combo-drink-choice" class="form-control">
+                        <option value="مشروب V-7 (كولا)">مشروب V-7 (كولا)</option>
+                        <option value="مشروب V-7 (كولا دايت)">مشروب V-7 (كولا دايت)</option>
+                        <option value="مشروب V-7 (ليمون نعناع)">مشروب V-7 (ليمون نعناع)</option>
+                        <option value="مشروب V-7 (ليمون ليم)">مشروب V-7 (ليمون ليم)</option>
+                        <option value="مشروب V-7 (توت)">مشروب V-7 (توت)</option>
+                        <option value="مشروب V-7 (رمان)">مشروب V-7 (رمان)</option>
+                        <option value="مشروب V-7 (بينك ليمونادا)">مشروب V-7 (بينك ليمونادا)</option>
+                        <option value="مشروب V-7 (بينا كولادا)">مشروب V-7 (بينا كولادا)</option>
+                        <option value="مشروب V-7 (تفاح شعير)">مشروب V-7 (تفاح شعير)</option>
+                        <option value="مشروب V-7 (اناناس شعير)">مشروب V-7 (اناناس شعير)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>3- Cookie Selection *</label>
+                    <select id="super-combo-cookie-choice" class="form-control">
+                        <option value="كوكيز الشيكولاتة والحليب">كوكيز الشيكولاتة والحليب</option>
+                        <option value="كوكيز الشيكولاتة الدراك">كوكيز الشيكولاتة الدراك</option>
+                        <option value="كوكيز الريد فيلفيت">كوكيز الريد فيلفيت</option>
+                        <option value="كوكيز الفول السوداني">كوكيز الفول السوداني</option>
+                        <option value="كوكيز الشوفان والزبيب">كوكيز الشوفان والزبيب</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="ramen-container" style="display: none;">
+                <div class="form-group">
+                    <label>Select Base Soup *</label>
+                    <select id="ramen-soup-choice" class="form-control">
+                        <option value="شوربة فاست ترافيل الأصلية">شوربة فاست ترافيل الأصلية</option>
+                        <option value="شوربة فاست ترافيل الحارة">شوربة فاست ترافيل الحارة</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Select The Topping *</label>
+                    <select id="ramen-topping-choice" class="form-control">
+                        <option value="دجاج بالزبدة والثوم">دجاج بالزبدة والثوم</option>
+                        <option value="دجاج حار بجوز الهند">دجاج حار بجوز الهند</option>
+                        <option value="قطع الدجاج المقرمشة">قطع الدجاج المقرمشة</option>
+                        <option value="كرات اللحم بالاعشاب">كرات اللحم بالاعشاب</option>
+                        <option value="السجق المدخن">السجق المدخن</option>
+                        <option value="هوت دوج خامض حلو">هوت دوج خامض حلو</option>
+                        <option value="الخضروات">الخضروات</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="confirmAddWithSide()" style="width:100%; margin-top:10px; padding:12px;">Add Item to Inventory ➔</button>
+        </div>
+    </div>
+
+    <!-- Cart Drawer Modal -->
+    <div id="cart-modal" class="modal-overlay" onclick="if(event.target === this) closeCartDrawer()">
+        <div class="modal-content" style="max-width: 400px; height: 80vh; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a080c; padding-bottom: 10px; margin-bottom: 14px;">
+                    <h3 class="section-title" style="font-size: 1.05rem; margin:0;"><span>🛒</span><span>Quest Inventory Basket</span></h3>
+                    <button class="close-modal" onclick="closeCartDrawer()">&times;</button>
+                </div>
+                <div id="cart-drawer-items" style="max-height: 48vh; overflow-y: auto; padding-right: 4px;"></div>
+            </div>
+            <div>
+                <div class="summary-box">
+                    <div class="summary-row"><span>Inventory Subtotal</span><span id="drawer-subtotal">0.00 EGP</span></div>
+                </div>
+                <button onclick="closeCartDrawer(); window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});" style="width:100%; margin-top:10px; padding:12px;">Proceed to Checkout Form ➔</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Success / Live Tracking Modal -->
+    <div id="success-modal" class="modal-overlay">
+        <div class="modal-content" style="text-align:center;">
+            <div style="font-size: 2.2rem; margin-bottom: 10px;">✅</div>
+            <h3 style="font-family:'Orbitron',sans-serif; font-size:1.25rem; color:#fff; margin-bottom:6px;">Order Successfully Submitted!</h3>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">Your Order are transmitted directly to Our Restaurant.</p>
+            
+            <div style="background:#12121a; border:1px solid #2a080c; padding:12px; border-radius:10px; text-align:left; margin-bottom:14px;">
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:6px;"><span style="color:var(--text-muted);">Order ID:</span> <span id="modal-order-id" style="font-family:monospace; color:var(--primary-red); font-weight:bold;"></span></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem;"><span style="color:var(--text-muted);">Status:</span> <span id="modal-order-status" style="background:rgba(255,30,60,0.1); color:var(--primary-red); border:1px solid rgba(255,30,60,0.2); padding:2px 8px; border-radius:6px; font-weight:bold;">Idle</span></div>
+            </div>
+
+            <button onclick="resetAndCloseSuccess()" style="width:100%; padding:12px;">Confirm</button>
+        </div>
+    </div>
+
+    <!-- Application Script Logic -->
+    <script src="config.js"></script>
+    <script>
+        const fallbackMenu = [
+            { id: "1", name: "Respawn Burger", category: "Burgers", price: 180, description: "Double smashed beef patty, melted cheddar cheese, signature respawn sauce, and crispy onion rings.", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "2", name: "Boss Level Mega Burger", category: "Burgers", price: 240, description: "Triple beef stack, smoked bacon, jalapeños, cheddar cheese fondue, and spicy checkpoint mayo.", image: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "3", name: "Pixel Chicken Sandwich", category: "Burgers", price: 165, description: "Crispy fried buttermilk chicken breast, coleslaw, pickles, and honey-mustard glaze.", image: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "18", name: "كومبو", category: "Combos", price: 210, description: "Delicious combo meal with customizable fries and drink selections.", image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "19", name: "سوبر كومبو", category: "Combos", price: 260, description: "Super combo meal with customizable fries, drink, and cookie selections.", image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "8", name: "مايتي تندر فردي", category: "Mighty Tender", price: 150, description: "Single Mighty Tender meal served with 1 side and 1 tender flavor.", image: "https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "9", name: "مايتي تندر سوبر", category: "Mighty Tender", price: 180, description: "Super Mighty Tender meal served with 1 side and 1 tender flavor.", image: "https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "10", name: "مايتي تندر ديو", category: "Mighty Tender", price: 220, description: "Duo Mighty Tender meal with 4 pcs, 2 sides and 2 flavors (each flavor assigned to 2 pieces).", image: "https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "11", name: "مايتي تندر تريبل", category: "Mighty Tender", price: 280, description: "Triple Mighty Tender meal with 6 pcs, 3 sides and 3 flavors (each flavor assigned to 2 pieces).", image: "https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "12", name: "مايتي تندر كوادرو", category: "Mighty Tender", price: 340, description: "Quadro Mighty Tender meal with 8 pcs, 4 sides and 4 flavors (each flavor assigned to 2 pieces).", image: "https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "13", name: "فاست ترافيل رامين", category: "Ramen", price: 190, description: "Signature handcrafted ramen served with choice of base soup and custom topping.", image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "14", name: "باكيت بطاطس", category: "Sides", price: 45, description: "Crispy french fries packet with customizable seasoning option.", image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "15", name: "طبق باستا", category: "Sides", price: 65, description: "Savory pasta plate with your choice of flavor style.", image: "https://images.unsplash.com/photo-1621996346565-e3d5d6281298?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "16", name: "طبق أرز", category: "Sides", price: 50, description: "Fluffy seasoned rice plate with custom flavor profile.", image: "https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "17", name: "صوص التندر", category: "Sides", price: 25, description: "Signature tender dipping sauce with your preferred flavor style.", image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "4", name: "Power-Up Fries", category: "Sides", price: 65, description: "Golden crispy french fries loaded with melted cheese sauce, crushed bacon bits, and spring onions.", image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "5", name: "XP Onion Rings", category: "Sides", price: 55, description: "Crispy battered sweet onion rings served with our legendary house special dipping sauce.", image: "https://images.unsplash.com/photo-1639024471283-03518883512d?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "6", name: "Mana Potion Soda", category: "Drinks", price: 35, description: "Refreshing blue raspberry energy soda guaranteed to restore your mental stamina.", image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
+            { id: "7", name: "Health Elixir Cola", category: "Drinks", price: 30, description: "Classic sparkling ice-cold cola served with crushed ice and a lemon wedge.", image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=600&q=80", available: "TRUE" }
+        ];
+
+        let menuItems = [];
+        let addressData = [];
+        let cart = [];
+        let currentDeliveryFee = 0;
+        let activeCategory = 'all';
+        let activeTrackingOrderId = null;
+        let statusPollInterval = null;
+        let pendingMealItem = null;
+        let pendingClickEvent = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadMenu();
+            loadAddressData();
+            updateCartUI();
+            setInterval(() => {
+                loadMenu(true);
+            }, 3000);
+        });
+
+        function sanitizeHTML(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        async function loadAddressData() {
+            try {
+                let res = await fetch(CONFIG.API_URL + "?action=getAddress");
+                let data = await res.json();
+                if (data && data.length > 0) {
+                    addressData = data;
+                    populateCities();
+                }
+            } catch (err) {
+                console.error("Failed to fetch address data from sheet", err);
+            }
+        }
+
+        function validateEgyptianPhone(inputElement) {
+            const phoneRegex = /^01[0125][0-9]{8}$/;
+            const errorElement = document.getElementById('phone-error');
+            
+            if (inputElement.value && !phoneRegex.test(inputElement.value)) {
+                inputElement.style.borderColor = 'var(--primary-red)';
+                if (errorElement) errorElement.style.display = 'block';
+                return false;
+            } else {
+                inputElement.style.borderColor = '#2a080c';
+                if (errorElement) errorElement.style.display = 'none';
+                return true;
+            }
+        }
+
+        function populateCities() {
+            const citySelect = document.getElementById('cust-city');
+            const cities = [...new Set(addressData.map(row => row.City || row.city))].filter(Boolean).sort();
+            
+            citySelect.innerHTML = '<option value="">-- Select City --</option>' + 
+                cities.map(city => `<option value="${sanitizeHTML(city)}">${sanitizeHTML(city)}</option>`).join('');
+        }
+
+        function onCityChange() {
+            const citySelect = document.getElementById('cust-city');
+            const areaSelect = document.getElementById('cust-area');
+            const selectedCity = citySelect.value;
+
+            areaSelect.innerHTML = '<option value="">-- Select Area --</option>';
+            areaSelect.disabled = true;
+            currentDeliveryFee = 0;
+            updateCartUI();
+
+            if (!selectedCity) return;
+
+            const filteredAreas = addressData.filter(row => (row.City || row.city) === selectedCity);
+            
+            areaSelect.innerHTML = '<option value="">-- Select Area --</option>' + 
+                filteredAreas.map(row => {
+                    const areaName = row.Area || row.area || '';
+                    return `<option value="${sanitizeHTML(areaName)}">${sanitizeHTML(areaName)}</option>`;
+                }).join('');
+            areaSelect.disabled = false;
+        }
+
+        function onAreaChange() {
+            const citySelect = document.getElementById('cust-city').value;
+            const areaSelect = document.getElementById('cust-area').value;
+
+            if (!citySelect || !areaSelect) {
+                currentDeliveryFee = 0;
+                updateCartUI();
+                return;
+            }
+
+            const match = addressData.find(row => 
+                (row.City || row.city) === citySelect && (row.Area || row.area) === areaSelect
+            );
+
+            if (match) {
+                currentDeliveryFee = parseFloat(match.Price || match.price || 0);
+            } else {
+                currentDeliveryFee = 0;
+            }
+            updateCartUI();
+        }
+
+        async function loadMenu(isBackground = false) {
+            let fetchedItems = [];
+            try {
+                let res = await fetch(CONFIG.API_URL + "?action=getMenu");
+                let data = await res.json();
+                if (data && data.length > 0) fetchedItems = data;
+            } catch (err) {}
+
+            if (fetchedItems.length === 0) {
+                const rawLocal = localStorage.getItem('fast_travel_menu');
+                if (rawLocal) {
+                    try { fetchedItems = JSON.parse(rawLocal); } catch(e) {}
+                }
+            }
+
+            menuItems = (fetchedItems.length > 0) ? fetchedItems : fallbackMenu;
+            
+            renderCategoryFilters();
+            renderMenu(activeCategory);
+        }
+
+        function renderCategoryFilters() {
+            const container = document.getElementById('category-filters');
+            const categories = ['all', ...new Set(menuItems.map(i => i.category || 'Burgers'))];
+            
+            container.innerHTML = categories.map(cat => {
+                const displayName = cat === 'all' ? 'All' : cat;
+                const isActive = activeCategory === cat ? 'active' : '';
+                return `<button onclick="filterMenu('${sanitizeHTML(cat)}')" class="cat-btn ${isActive}">${sanitizeHTML(displayName)}</button>`;
+            }).join('');
+        }
+
+        function filterMenu(category) {
+            activeCategory = category;
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+            renderMenu(category);
+        }
+
+        function renderMenu(category) {
+            const grid = document.getElementById('menu-grid');
+            const filtered = category === 'all' ? menuItems : menuItems.filter(i => (i.category || 'Burgers') === category);
+            
+            if (!filtered || filtered.length === 0) {
+                grid.innerHTML = "<div class='empty-state'>No provisions found in this category dimension.</div>";
+                return;
+            }
+
+            grid.innerHTML = filtered.map(item => {
+                let isAvailable = (item.available === "TRUE" || item.available === true || item.available === "1");
+                let cardClass = isAvailable ? "card" : "card unavailable";
+                let badgeHTML = isAvailable 
+                    ? `<div class="availability-badge badge-available">Available 🟢</div>`
+                    : `<div class="availability-badge badge-unavailable">Unavailable 🔴</div>`;
+                
+                let buttonHTML = isAvailable
+                    ? `<button onclick="addToCart(event, '${sanitizeHTML(item.id || item.name)}')" style="width:100%; margin-top:8px;">+ Add To Cart</button>`
+                    : `<button disabled style="width:100%; margin-top:8px;">Currently Unavailable ⛔</button>`;
+
+                return `
+                    <div class="${cardClass}">
+                        <div class="card-img-wrapper">
+                            <img src="${sanitizeHTML(item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400')}" alt="${sanitizeHTML(item.name || '')}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'">
+                            ${badgeHTML}
+                            <div class="price-tag">${item.price || '0'} EGP</div>
+                        </div>
+                        <div class="card-body">
+                            <div>
+                                <h3>${sanitizeHTML(item.name || '')}</h3>
+                                <p>${sanitizeHTML(item.description || 'Delicious realm provision prepared with high-grade ingredients.')}</p>
+                            </div>
+                            ${buttonHTML}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function playFlyToCartAnimation(event) {
+            const button = event.target;
+            const cardImg = button.closest('.card').querySelector('img');
+            const cartTarget = document.getElementById('cart-btn-target');
+
+            if (!cardImg || !cartTarget) return;
+
+            const imgRect = cardImg.getBoundingClientRect();
+            const cartRect = cartTarget.getBoundingClientRect();
+
+            const flyer = document.createElement('img');
+            flyer.src = cardImg.src;
+            flyer.className = 'flying-item';
+            
+            flyer.style.left = `${imgRect.left + imgRect.width / 2 - 20}px`;
+            flyer.style.top = `${imgRect.top + imgRect.height / 2 - 20}px`;
+            document.body.appendChild(flyer);
+
+            flyer.getBoundingClientRect();
+
+            flyer.style.left = `${cartRect.left + cartRect.width / 2 - 20}px`;
+            flyer.style.top = `${cartRect.top + cartRect.height / 2 - 20}px`;
+            flyer.style.transform = 'scale(0.15) rotate(360deg)';
+            flyer.style.opacity = '0.3';
+
+            setTimeout(() => {
+                flyer.remove();
+                const badge = document.getElementById('cart-badge');
+                badge.classList.remove('pulse-badge');
+                void badge.offsetWidth;
+                badge.classList.add('pulse-badge');
+            }, 800);
+        }
+
+        function addToCart(event, id) {
+            const item = menuItems.find(i => String(i.id) === String(id) || i.name === id);
+            if (!item) return;
+
+            let isAvailable = (item.available === "TRUE" || item.available === true || item.available === "1");
+            if (!isAvailable) {
+                alert("This provision is currently unavailable and cannot be added to your cart.");
+                return;
+            }
+
+            const itemName = String(item.name || '').trim();
+            const category = String(item.category || '').toLowerCase();
+            const isNoFaceCookies = category.includes('no-face cookies');
+            const isMightyTenderItem = itemName.includes('مايتي تندر');
+            const isRamenItem = itemName.includes('رامين') || category.includes('ramen');
+            const isSpecificItem = itemName === 'باكيت بطاطس' || itemName === 'طبق باستا' || itemName === 'طبق أرز' || itemName === 'صوص التندر';
+            const isComboItem = itemName === 'كومبو';
+            const isSuperComboItem = itemName === 'سوبر كومبو';
+            
+            if (!isNoFaceCookies && (isMightyTenderItem || isRamenItem || isSpecificItem || isComboItem || isSuperComboItem || category.includes('burger') || category.includes('meal') || category.includes('main') || (!category.includes('drink') && !category.includes('side')))) {
+                pendingMealItem = item;
+                pendingClickEvent = event;
+                document.getElementById('side-modal-item-name').innerText = `Customize: ${item.name}`;
+
+                buildCustomizationFields(itemName, category);
+                document.getElementById('side-modal').style.display = 'flex';
+                return;
+            }
+
+            finalizeAddToCart(event, item, null, null, null, null, null, null, null, null);
+        }
+
+        function buildCustomizationFields(itemName, category) {
+            const sidesContainer = document.getElementById('sides-container');
+            const flavorsContainer = document.getElementById('flavors-container');
+            const specificContainer = document.getElementById('specific-flavor-container');
+            const comboContainer = document.getElementById('combo-container');
+            const superComboContainer = document.getElementById('super-combo-container');
+            const ramenContainer = document.getElementById('ramen-container');
+            
+            let numSides = 1;
+            let numFlavors = 1;
+            let isMightyTender = false;
+            let isRamen = itemName.includes('رامين') || category.includes('ramen');
+            let isSpecificItem = itemName === 'باكيت بطاطس' || itemName === 'طبق باستا' || itemName === 'طبق أرز' || itemName === 'صوص التندر';
+            let isCombo = itemName === 'كومبو';
+            let isSuperCombo = itemName === 'سوبر كومبو';
+
+            if (isRamen) {
+                sidesContainer.style.display = 'none';
+                flavorsContainer.style.display = 'none';
+                specificContainer.style.display = 'none';
+                comboContainer.style.display = 'none';
+                superComboContainer.style.display = 'none';
+                ramenContainer.style.display = 'block';
+                return;
+            }
+
+            if (isSpecificItem) {
+                sidesContainer.style.display = 'none';
+                flavorsContainer.style.display = 'none';
+                comboContainer.style.display = 'none';
+                superComboContainer.style.display = 'none';
+                ramenContainer.style.display = 'none';
+                document.getElementById('specific-flavor-label').innerText = `Select Option for ${itemName} *`;
+                specificContainer.style.display = 'block';
+                return;
+            }
+
+            if (isCombo) {
+                sidesContainer.style.display = 'none';
+                flavorsContainer.style.display = 'none';
+                specificContainer.style.display = 'none';
+                superComboContainer.style.display = 'none';
+                ramenContainer.style.display = 'none';
+                comboContainer.style.display = 'block';
+                return;
+            }
+
+            if (isSuperCombo) {
+                sidesContainer.style.display = 'none';
+                flavorsContainer.style.display = 'none';
+                specificContainer.style.display = 'none';
+                comboContainer.style.display = 'none';
+                ramenContainer.style.display = 'none';
+                superComboContainer.style.display = 'block';
+                return;
+            }
+
+            ramenContainer.style.display = 'none';
+            specificContainer.style.display = 'none';
+            comboContainer.style.display = 'none';
+            superComboContainer.style.display = 'none';
+
+            if (itemName.includes('مايتي تندر فردي') || itemName.includes('مايتي تندر سوبر')) {
+                numSides = 1;
+                numFlavors = 1;
+                isMightyTender = true;
+            } else if (itemName.includes('مايتي تندر ديو')) {
+                numSides = 2;
+                numFlavors = 2;
+                isMightyTender = true;
+            } else if (itemName.includes('مايتي تندر تريبل')) {
+                numSides = 3;
+                numFlavors = 3;
+                isMightyTender = true;
+            } else if (itemName.includes('مايتي تندر كوادرو')) {
+                numSides = 4;
+                numFlavors = 4;
+                isMightyTender = true;
+            }
+
+            const sideOptionsHTML = `
+                <option value="Rice">Rice 🍚</option>
+                <option value="Pasta">Pasta 🍝</option>
+                <option value="Fries" selected>Fries 🍟</option>
+                <option value="Sandwich">Sandwich 🥪</option>
+            `;
+
+            const flavorOptionsHTML = `
+                <option value="كلاسيك">كلاسيك</option>
+                <option value="أعشاب">أعشاب</option>
+                <option value="حار">حار</option>
+                <option value="اناناس مدخن">اناناس مدخن</option>
+                <option value="كاري">كاري</option>
+            `;
+
+            let sidesHTML = '';
+            for (let i = 1; i <= numSides; i++) {
+                sidesHTML += `
+                    <div class="form-group">
+                        <label>Select Side Option #${i} *</label>
+                        <select id="meal-side-choice-${i}" class="form-control">
+                            ${sideOptionsHTML}
+                        </select>
+                    </div>
+                `;
+            }
+            sidesContainer.innerHTML = sidesHTML;
+            sidesContainer.style.display = 'block';
+
+            if (isMightyTender) {
+                flavorsContainer.style.display = 'block';
+                let flavorsHTML = '';
+                for (let i = 1; i <= numFlavors; i++) {
+                    flavorsHTML += `
+                        <div class="form-group">
+                            <label>Select Tender Flavor #${i} ${numFlavors > 1 ? '(Assigned to 2 pieces)' : ''} *</label>
+                            <select id="tender-flavor-choice-${i}" class="form-control">
+                                ${flavorOptionsHTML}
+                            </select>
+                        </div>
+                    `;
+                }
+                flavorsContainer.innerHTML = flavorsHTML;
+            } else {
+                flavorsContainer.style.display = 'none';
+            }
+        }
+
+        function confirmAddWithSide() {
+            const itemName = String(pendingMealItem.name || '').trim();
+            const category = String(pendingMealItem.category || '').toLowerCase();
+            const isRamen = itemName.includes('رامين') || category.includes('ramen');
+            const isSpecificItem = itemName === 'باكيت بطاطس' || itemName === 'طبق باستا' || itemName === 'طبق أرز' || itemName === 'صوص التندر';
+            const isCombo = itemName === 'كومبو';
+            const isSuperCombo = itemName === 'سوبر كومبو';
+            
+            let sides = [];
+            let flavors = [];
+            let ramenSoup = null;
+            let ramenTopping = null;
+            let specificOption = null;
+            let comboFries = null;
+            let comboDrink = null;
+            let superComboFries = null;
+            let superComboDrink = null;
+            let superComboCookie = null;
+
+            if (isRamen) {
+                ramenSoup = document.getElementById('ramen-soup-choice').value;
+                ramenTopping = document.getElementById('ramen-topping-choice').value;
+            } else if (isSpecificItem) {
+                specificOption = document.getElementById('specific-flavor-choice').value;
+            } else if (isCombo) {
+                comboFries = document.getElementById('combo-fries-choice').value;
+                comboDrink = document.getElementById('combo-drink-choice').value;
+            } else if (isSuperCombo) {
+                superComboFries = document.getElementById('super-combo-fries-choice').value;
+                superComboDrink = document.getElementById('super-combo-drink-choice').value;
+                superComboCookie = document.getElementById('super-combo-cookie-choice').value;
+            } else {
+                const isMightyTender = itemName.includes('مايتي تندر');
+                let numSelections = 1;
+
+                if (itemName.includes('مايتي تندر ديو')) numSelections = 2;
+                else if (itemName.includes('مايتي تندر تريبل')) numSelections = 3;
+                else if (itemName.includes('مايتي تندر كوادرو')) numSelections = 4;
+
+                for (let i = 1; i <= numSelections; i++) {
+                    const sideVal = document.getElementById(`meal-side-choice-${i}`)?.value || 'Fries';
+                    sides.push(sideVal);
+
+                    if (isMightyTender) {
+                        const flavVal = document.getElementById(`tender-flavor-choice-${i}`)?.value || 'كلاسيك';
+                        flavors.push(flavVal);
+                    }
+                }
+            }
+
+            document.getElementById('side-modal').style.display = 'none';
+            if (pendingMealItem && pendingClickEvent) {
+                finalizeAddToCart(pendingClickEvent, pendingMealItem, sides, flavors, ramenSoup, ramenTopping, specificOption, comboFries, comboDrink, superComboFries, superComboDrink, superComboCookie);
+            }
+            pendingMealItem = null;
+            pendingClickEvent = null;
+        }
+
+        function closeSideModal() {
+            document.getElementById('side-modal').style.display = 'none';
+            pendingMealItem = null;
+            pendingClickEvent = null;
+        }
+
+        function finalizeAddToCart(event, item, sides, flavors, ramenSoup, ramenTopping, specificOption, comboFries, comboDrink, superComboFries, superComboDrink, superComboCookie) {
+            playFlyToCartAnimation(event);
+
+            let cartKey = String(item.id || item.name);
+            let displayName = item.name;
+            let adjustedPrice = parseFloat(item.price || 0);
+
+            if (sides && sides.length > 0) {
+                cartKey += `_sides_${sides.join('-')}`;
+                displayName += ` (Sides: ${sides.join(', ')})`;
+            }
+
+            if (flavors && flavors.length > 0) {
+                cartKey += `_flavors_${flavors.join('-')}`;
+                displayName += ` (Flavors: ${flavors.join(', ')})`;
+            }
+
+            if (ramenSoup && ramenTopping) {
+                cartKey += `_soup_${ramenSoup}_top_${ramenTopping}`;
+                displayName += ` (Soup: ${ramenSoup}, Topping: ${ramenTopping})`;
+            }
+
+            if (specificOption) {
+                cartKey += `_opt_${specificOption}`;
+                displayName += ` (Option: ${specificOption})`;
+            }
+
+            if (comboFries && comboDrink) {
+                cartKey += `_cf_${comboFries}_cd_${comboDrink}`;
+                displayName += ` (Fries: ${comboFries}, Drink: ${comboDrink})`;
+            }
+
+            if (superComboFries && superComboDrink && superComboCookie) {
+                cartKey += `_scf_${superComboFries}_scd_${superComboDrink}_scc_${superComboCookie}`;
+                displayName += ` (Fries: ${superComboFries}, Drink: ${superComboDrink}, Cookie: ${superComboCookie})`;
+            }
+
+            const existing = cart.find(i => i.cartKey === cartKey);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ 
+                    ...item, 
+                    price: adjustedPrice,
+                    cartKey: cartKey,
+                    displayName: displayName,
+                    qty: 1,
+                    sides: sides,
+                    flavors: flavors,
+                    ramenSoup: ramenSoup,
+                    ramenTopping: ramenTopping,
+                    specificOption: specificOption,
+                    comboFries: comboFries,
+                    comboDrink: comboDrink,
+                    superComboFries: superComboFries,
+                    superComboDrink: superComboDrink,
+                    superComboCookie: superComboCookie
+                });
+            }
+            updateCartUI();
+        }
+
+        function updateQty(cartKey, delta) {
+            const item = cart.find(i => i.cartKey === cartKey);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    cart = cart.filter(i => i.cartKey !== cartKey);
+                }
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById('cart-badge').innerText = totalCount;
+
+            const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.qty), 0);
+            const grandTotal = subtotal > 0 ? subtotal + currentDeliveryFee : 0;
+
+            document.getElementById('summary-subtotal').innerText = `${subtotal.toFixed(2)} EGP`;
+            document.getElementById('summary-delivery').innerText = `${currentDeliveryFee.toFixed(2)} EGP`;
+            document.getElementById('summary-total').innerText = `${grandTotal.toFixed(2)} EGP`;
+            document.getElementById('drawer-subtotal').innerText = `${subtotal.toFixed(2)} EGP`;
+
+            const summaryItemsList = document.getElementById('summary-items-list');
+            if (cart.length === 0) {
+                summaryItemsList.innerHTML = '<span style="color: var(--text-muted); font-style: italic;">No provisions selected yet.</span>';
+            } else {
+                summaryItemsList.innerHTML = cart.map(item => `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px dashed #2a080c; padding-bottom: 3px;">
+                        <span style="color: var(--text-main); font-weight: 500;">${sanitizeHTML(item.displayName)} <span style="color: var(--text-muted); font-size: 0.7rem;">(x${item.qty})</span></span>
+                        <span style="color: var(--primary-red); font-weight: 700;">${(parseFloat(item.price) * item.qty).toFixed(2)} EGP</span>
+                    </div>
+                `).join('');
+            }
+
+            const drawerContainer = document.getElementById('cart-drawer-items');
+            if (cart.length === 0) {
+                drawerContainer.innerHTML = '<p class="empty-state">Your quest inventory basket is currently empty.</p>';
+                return;
+            }
+
+            drawerContainer.innerHTML = cart.map(item => `
+                <div class="cart-item-row">
+                    <div>
+                        <h4 style="font-size:0.85rem; color:#fff; font-weight:bold;">${sanitizeHTML(item.displayName)}</h4>
+                        <p style="font-size:0.75rem; color:var(--primary-red); font-weight:bold;">${(parseFloat(item.price) * item.qty).toFixed(2)} EGP</p>
+                    </div>
+                    <div class="qty-controls">
+                        <button class="qty-btn" onclick="updateQty('${sanitizeHTML(item.cartKey)}', -1)">-</button>
+                        <span style="font-size:0.85rem; font-weight:bold; width:16px; text-align:center;">${item.qty}</span>
+                        <button class="qty-btn" onclick="updateQty('${sanitizeHTML(item.cartKey)}', 1)">+</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openCartDrawer() { document.getElementById('cart-modal').style.display = 'flex'; }
+        function closeCartDrawer() { document.getElementById('cart-modal').style.display = 'none'; }
+
+        async function submitOrder(e) {
+            e.preventDefault();
+
+            const phoneInput = document.getElementById('cust-phone');
+            const phoneRegex = /^01[0125][0-9]{8}$/;
+            if (!phoneRegex.test(phoneInput.value)) {
+                alert("Please enter a valid Egyptian mobile number starting with 010, 011, 012, or 015 consisting of 11 digits.");
+                phoneInput.focus();
+                return;
+            }
+            if (cart.length === 0) {
+                alert("Please add at least one provision to your basket before ordering.");
+                return;
+            }
+
+            const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.qty), 0);
+            const minimumOrderAmount = 200;
+
+            if (subtotal < minimumOrderAmount) {
+                alert(`The minimum order amount for delivery is ${minimumOrderAmount} EGP (excluding delivery fee). Your current subtotal is ${subtotal.toFixed(2)} EGP.`);
+                return;
+            }
+
+            const city = document.getElementById('cust-city').value;
+            const area = document.getElementById('cust-area').value;
+            const street = document.getElementById('cust-street').value;
+            const fullAddress = `${city}, ${area} - ${street}`;
+
+            const formattedItemsString = cart.map(item => `${item.displayName} (x${item.qty})`).join(' | ');
+
+            const orderId = "FTR-" + Math.floor(100000 + Math.random() * 900000);
+            const orderPayload = {
+                orderId: orderId,
+                OrderID: orderId,
+                name: document.getElementById('cust-name').value,
+                CustomerName: document.getElementById('cust-name').value,
+                phone: document.getElementById('cust-phone').value,
+                CustomerPhone: document.getElementById('cust-phone').value,
+                address: fullAddress,
+                City: city,
+                Area: area,
+                District: area,
+                Street: street,
+                payment: document.getElementById('cust-payment').value,
+                items: cart,
+                Items: formattedItemsString,
+                total: document.getElementById('summary-total').innerText,
+                Total: document.getElementById('summary-total').innerText.replace(" EGP", ""),
+                status: 'Idle',
+                Status: 'Idle',
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                const raw = localStorage.getItem('fast_travel_orders');
+                const orders = raw ? JSON.parse(raw) : [];
+                orders.push(orderPayload);
+                localStorage.setItem('fast_travel_orders', JSON.stringify(orders));
+            } catch (err) {}
+
+            try {
+                await fetch(CONFIG.API_URL, {
+                    method: "POST",
+                    body: JSON.stringify({ action: "placeOrder", order: orderPayload })
+                });
+            } catch (err) {}
+
+            activeTrackingOrderId = orderId;
+            document.getElementById('modal-order-id').innerText = orderId;
+            document.getElementById('success-modal').style.display = 'flex';
+
+            if (statusPollInterval) clearInterval(statusPollInterval);
+            statusPollInterval = setInterval(pollOrderStatus, 3000);
+        }
+
+        function pollOrderStatus() {
+            if (!activeTrackingOrderId) return;
+            const raw = localStorage.getItem('fast_travel_orders');
+            if (!raw) return;
+            const orders = JSON.parse(raw);
+            const found = orders.find(o => o.orderId === activeTrackingOrderId || o.OrderID === activeTrackingOrderId);
+            if (found) {
+                const status = found.status || found.Status;
+                document.getElementById('modal-order-status').innerText = status;
+            }
+        }
+
+        function resetAndCloseSuccess() {
+            cart = [];
+            updateCartUI();
+            document.getElementById('checkout-form').reset();
+            document.getElementById('cust-area').innerHTML = '<option value="">-- Select City First --</option>';
+            document.getElementById('cust-area').disabled = true;
+            currentDeliveryFee = 0;
+            updateCartUI();
+            document.getElementById('success-modal').style.display = 'none';
+            activeTrackingOrderId = null;
+            if (statusPollInterval) clearInterval(statusPollInterval);
+        }
+    </script>
+</body>
+</html>
