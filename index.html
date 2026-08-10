@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr" id="html-root">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fast Travel Restaurant | Realm Portal & Ordering Hub</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <title id="page-title">Fast Travel Restaurant | Realm Portal & Ordering Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-deep: #050508;
@@ -32,6 +32,11 @@
                 linear-gradient(rgba(5, 5, 8, 0.92), rgba(5, 5, 8, 0.92)),
                 repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255, 30, 60, 0.025) 40px, rgba(255, 30, 60, 0.025) 41px);
             padding-top: 90px;
+        }
+
+        /* Arabic Font Support */
+        body.lang-ar {
+            font-family: 'Cairo', sans-serif;
         }
 
         /* Portal Header & Navigation Bar */
@@ -74,6 +79,11 @@
             font-size: 1rem;
         }
 
+        body.lang-ar .brand-title h1 {
+            font-family: 'Cairo', sans-serif;
+            font-weight: 900;
+        }
+
         .brand-title p {
             font-size: 0.65rem;
             color: #c0c0d0;
@@ -87,6 +97,11 @@
             align-items: center;
             gap: 10px;
             margin-left: auto;
+        }
+
+        body.lang-ar .header-actions {
+            margin-left: unset;
+            margin-right: auto;
         }
 
         button, .btn {
@@ -107,6 +122,11 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
+        }
+
+        body.lang-ar button, body.lang-ar .btn {
+            font-family: 'Cairo', sans-serif;
+            text-transform: none;
         }
 
         button:hover, .btn:hover {
@@ -188,6 +208,10 @@
             text-shadow: 0 0 6px var(--primary-glow);
         }
 
+        body.lang-ar .section-title {
+            font-family: 'Cairo', sans-serif;
+        }
+
         .category-filters {
             display: flex;
             gap: 6px;
@@ -206,6 +230,10 @@
             font-family: 'Rajdhani', sans-serif;
             font-weight: 700;
             transition: 0.2s;
+        }
+
+        body.lang-ar .cat-btn {
+            font-family: 'Cairo', sans-serif;
         }
 
         .cat-btn.active, .cat-btn:hover {
@@ -292,6 +320,12 @@
             font-size: 0.8rem;
         }
 
+        body.lang-ar .price-tag {
+            right: unset;
+            left: 8px;
+            font-family: 'Cairo', sans-serif;
+        }
+
         .availability-badge {
             position: absolute;
             top: 8px;
@@ -303,6 +337,13 @@
             font-size: 0.7rem;
             font-weight: 700;
         }
+
+        body.lang-ar .availability-badge {
+            left: unset;
+            right: 8px;
+            font-family: 'Cairo', sans-serif;
+        }
+
         .badge-available { background: rgba(16, 185, 129, 0.85); color: #fff; border: 1px solid #059669; }
         .badge-unavailable { background: rgba(225, 29, 72, 0.85); color: #fff; border: 1px solid #9f1239; }
 
@@ -320,6 +361,10 @@
             font-size: 1.2rem;
             color: #fff;
             margin-bottom: 4px;
+        }
+
+        body.lang-ar .card-body h3 {
+            font-family: 'Cairo', sans-serif;
         }
 
         .card-body p {
@@ -361,6 +406,10 @@
             letter-spacing: 1px;
         }
 
+        body.lang-ar .form-group label {
+            text-transform: none;
+        }
+
         .form-control {
             width: 100%;
             background: #12121a;
@@ -372,6 +421,10 @@
             font-size: 1rem;
             outline: none;
             transition: 0.3s;
+        }
+
+        body.lang-ar .form-control {
+            font-family: 'Cairo', sans-serif;
         }
 
         .form-control:focus {
@@ -407,6 +460,11 @@
             padding-top: 8px;
             margin-top: 4px;
         }
+
+        body.lang-ar .summary-total {
+            font-family: 'Cairo', sans-serif;
+        }
+
         .summary-total span:last-child { color: var(--primary-red); }
 
         /* Modals & Popups */
@@ -433,6 +491,11 @@
             position: relative;
             max-height: 90vh;
             overflow-y: auto;
+            text-align: left;
+        }
+
+        body.lang-ar .modal-content {
+            text-align: right;
         }
 
         .close-modal {
@@ -448,6 +511,12 @@
             padding: 0;
             width: auto;
         }
+
+        body.lang-ar .close-modal {
+            right: unset;
+            left: 15px;
+        }
+
         .close-modal:hover { color: #fff; box-shadow: none; filter: none; }
 
         .cart-item-row {
@@ -494,21 +563,24 @@
         }
     </style>
 </head>
-<body>
+<body class="lang-en">
 
     <!-- Navigation Header -->
     <header>
         <div class="brand-container">
             <img src="crystal-emblem.png" alt="Realm Portal Crystal" class="portal-emblem" title="Realm Portal">
             <div class="brand-title">
-                <h1>FAST TRAVEL RESTAURANT</h1>
-                <p>Quest Complete It's Time To Eat</p>
+                <h1 data-i18n="brand_title">FAST TRAVEL RESTAURANT</h1>
+                <p data-i18n="brand_subtitle">Quest Complete It's Time To Eat</p>
             </div>
         </div>
         
         <div class="header-actions">
+            <button id="lang-toggle-btn" onclick="toggleLanguage()" class="btn" style="background: #1e1e2d; border: 1px solid var(--primary-red);">
+                🌐 <span id="lang-label">العربية</span>
+            </button>
             <button id="cart-btn-target" onclick="openCartDrawer()" class="btn">
-                <span>🛒 Cart</span>
+                <span>🛒 <span data-i18n="cart_btn">Cart</span></span>
                 <span id="cart-badge" style="background:#fff; color:var(--primary-red); padding: 1px 6px; border-radius:10px; font-size:0.75rem;">0</span>
             </button>
         </div>
@@ -520,66 +592,67 @@
         <!-- Menu Realm Section -->
         <main>
             <div class="section-header">
-                <h2 class="section-title"><span>📜</span><span>The Menu</span></h2>
+                <h2 class="section-title"><span>📜</span><span data-i18n="menu_title">The Menu</span></h2>
                 <div class="category-filters" id="category-filters">
-                    <button onclick="filterMenu('all')" class="cat-btn active">All</button>
+                    <button onclick="filterMenu('all')" class="cat-btn active" data-i18n="cat_all">All</button>
                 </div>
             </div>
 
             <div id="menu-grid" class="menu-grid">
-                <div class="loading-state">Opening dimensional rift to retrieve menu items...</div>
+                <div class="loading-state" data-i18n="loading_menu">Opening dimensional rift to retrieve menu items...</div>
             </div>
         </main>
 
         <!-- Quick Checkout Sidebar -->
         <aside>
             <div class="sidebar-panel">
-                <h2 class="section-title" style="font-size: 1.05rem; margin-bottom: 14px;"><span>♦️</span><span>Quick Checkout Form</span></h2>
+                <h2 class="section-title" style="font-size: 1.05rem; margin-bottom: 14px;"><span>♦️</span><span data-i18n="checkout_title">Quick Checkout Form</span></h2>
                 
                 <form id="checkout-form" onsubmit="submitOrder(event)">
                     <div class="form-group">
-                        <label>Full Name *</label>
-                        <input type="text" id="cust-name" required placeholder="e.g. Mario Player" class="form-control">
+                        <label data-i18n="label_name">Full Name *</label>
+                        <input type="text" id="cust-name" required placeholder="e.g. Mario Player" class="form-control" data-i18n-placeholder="placeholder_name">
                     </div>
 
                     <div class="form-group">
-                        <label>Phone *</label>
+                        <label data-i18n="label_phone">Phone *</label>
                         <input type="tel" id="cust-phone" required 
                                placeholder="e.g. 01012345678" 
                                pattern="^01[0125][0-9]{8}$" 
                                title="Please enter a valid Egyptian mobile number (e.g., 01012345678)" 
                                class="form-control" 
-                               oninput="validateEgyptianPhone(this)">
-                        <small id="phone-error" style="color: var(--primary-red); font-size: 0.7rem; display: none; margin-top: 4px;">Invalid Egyptian mobile number format (must start with 010, 011, 012, or 015 and be 11 digits).</small>
+                               oninput="validateEgyptianPhone(this)"
+                               data-i18n-placeholder="placeholder_phone">
+                        <small id="phone-error" style="color: var(--primary-red); font-size: 0.7rem; display: none; margin-top: 4px;" data-i18n="phone_error">Invalid Egyptian mobile number format (must start with 010, 011, 012, or 015 and be 11 digits).</small>
                     </div>
 
                     <!-- City Selection -->
                     <div class="form-group">
-                        <label>City *</label>
+                        <label data-i18n="label_city">City *</label>
                         <select id="cust-city" required class="form-control" onchange="onCityChange()">
-                            <option value="">Loading cities...</option>
+                            <option value="" data-i18n="loading_cities">Loading cities...</option>
                         </select>
                     </div>
 
                     <!-- Area Selection -->
                     <div class="form-group">
-                        <label>Area *</label>
+                        <label data-i18n="label_area">Area *</label>
                         <select id="cust-area" required class="form-control" disabled onchange="onAreaChange()">
-                            <option value="">-- Select City First --</option>
+                            <option value="" data-i18n="select_city_first">-- Select City First --</option>
                         </select>
                     </div>
 
                     <!-- Street Address Text Box -->
                     <div class="form-group">
-                        <label>Address details *</label>
-                        <input type="text" id="cust-street" required placeholder="Street name, building number, floor..." class="form-control">
+                        <label data-i18n="label_address">Address details *</label>
+                        <input type="text" id="cust-street" required placeholder="Street name, building number, floor..." class="form-control" data-i18n-placeholder="placeholder_address">
                     </div>
 
                     <div class="form-group">
-                        <label>Payment Selection *</label>
+                        <label data-i18n="label_payment">Payment Selection *</label>
                         <select id="cust-payment" class="form-control">
-                            <option value="Cash on Delivery">Cash on Delivery 💵</option>
-                            <option value="Card on Delivery (POS)">Card on Delivery (POS Machine) 💳</option>
+                            <option value="Cash on Delivery" data-i18n="pay_cod">Cash on Delivery 💵</option>
+                            <option value="Card on Delivery (POS)" data-i18n="pay_card">Card on Delivery (POS Machine) 💳</option>
                         </select>
                     </div>
 
@@ -587,20 +660,20 @@
                         <div id="summary-items-list" style="margin-bottom: 10px; font-size: 0.8rem; max-height: 130px; overflow-y: auto; padding-right: 4px;"></div>
 
                         <div class="summary-row">
-                            <span>Subtotal</span>
+                            <span data-i18n="subtotal">Subtotal</span>
                             <span id="summary-subtotal">0.00 EGP</span>
                         </div>
                         <div class="summary-row">
-                            <span>Delivery Fee</span>
+                            <span data-i18n="delivery_fee">Delivery Fee</span>
                             <span id="summary-delivery">0.00 EGP</span>
                         </div>
                         <div class="summary-total">
-                            <span>Total Amount</span>
+                            <span data-i18n="total_amount">Total Amount</span>
                             <span id="summary-total">0.00 EGP</span>
                         </div>
                     </div>
 
-                    <button type="submit" style="width:100%; margin-top:14px; padding:12px;">Confirm & Dispatch Order 🍴</button>
+                    <button type="submit" style="width:100%; margin-top:14px; padding:12px;" data-i18n="confirm_btn">Confirm & Dispatch Order 🍴</button>
                 </form>
             </div>
         </aside>
@@ -610,26 +683,26 @@
     <div id="side-modal" class="modal-overlay" onclick="if(event.target === this) closeSideModal()">
         <div class="modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a080c; padding-bottom: 10px; margin-bottom: 14px;">
-                <h3 class="section-title" style="font-size: 1.05rem; margin:0;"><span>🍜</span><span>Customize Item Options</span></h3>
+                <h3 class="section-title" style="font-size: 1.05rem; margin:0;"><span>🍜</span><span data-i18n="modal_customize_title">Customize Item Options</span></h3>
                 <button class="close-modal" onclick="closeSideModal()">&times;</button>
             </div>
             <p id="side-modal-item-name" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: bold;"></p>
             
             <div id="sides-container">
                 <div class="form-group">
-                    <label>Select Side Option *</label>
+                    <label data-i18n="label_side_option">Select Side Option *</label>
                     <select id="meal-side-choice-1" class="form-control">
-                        <option value="Rice">Rice 🍚</option>
-                        <option value="Pasta">Pasta 🍝</option>
-                        <option value="Fries" selected>Fries 🍟</option>
-                        <option value="Sandwich">Sandwich 🥪</option>
+                        <option value="Rice" data-i18n="side_rice">Rice 🍚</option>
+                        <option value="Pasta" data-i18n="side_pasta">Pasta 🍝</option>
+                        <option value="Fries" selected data-i18n="side_fries">Fries 🍟</option>
+                        <option value="Sandwich" data-i18n="side_sandwich">Sandwich 🥪</option>
                     </select>
                 </div>
             </div>
 
             <div id="flavors-container" style="display: none;">
                 <div class="form-group">
-                    <label>Select Tender Flavor *</label>
+                    <label data-i18n="label_tender_flavor">Select Tender Flavor *</label>
                     <select id="tender-flavor-choice-1" class="form-control">
                         <option value="كلاسيك">كلاسيك</option>
                         <option value="أعشاب">أعشاب</option>
@@ -655,7 +728,7 @@
 
             <div id="combo-container" style="display: none;">
                 <div class="form-group">
-                    <label>1- Fries Selection *</label>
+                    <label data-i18n="label_combo_fries">1- Fries Selection *</label>
                     <select id="combo-fries-choice" class="form-control">
                         <option value="كلاسيك">كلاسيك</option>
                         <option value="أعشاب">أعشاب</option>
@@ -665,7 +738,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>2- Drink Selection *</label>
+                    <label data-i18n="label_combo_drink">2- Drink Selection *</label>
                     <select id="combo-drink-choice" class="form-control">
                         <option value="مشروب V-7 (كولا)">مشروب V-7 (كولا)</option>
                         <option value="مشروب V-7 (كولا دايت)">مشروب V-7 (كولا دايت)</option>
@@ -683,7 +756,7 @@
 
             <div id="super-combo-container" style="display: none;">
                 <div class="form-group">
-                    <label>1- Fries Selection *</label>
+                    <label data-i18n="label_combo_fries">1- Fries Selection *</label>
                     <select id="super-combo-fries-choice" class="form-control">
                         <option value="كلاسيك">كلاسيك</option>
                         <option value="أعشاب">أعشاب</option>
@@ -693,7 +766,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>2- Drink Selection *</label>
+                    <label data-i18n="label_combo_drink">2- Drink Selection *</label>
                     <select id="super-combo-drink-choice" class="form-control">
                         <option value="مشروب V-7 (كولا)">مشروب V-7 (كولا)</option>
                         <option value="مشروب V-7 (كولا دايت)">مشروب V-7 (كولا دايت)</option>
@@ -708,7 +781,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>3- Cookie Selection *</label>
+                    <label data-i18n="label_cookie">3- Cookie Selection *</label>
                     <select id="super-combo-cookie-choice" class="form-control">
                         <option value="كوكيز الشيكولاتة والحليب">كوكيز الشيكولاتة والحليب</option>
                         <option value="كوكيز الشيكولاتة الدراك">كوكيز الشيكولاتة الدراك</option>
@@ -721,14 +794,14 @@
 
             <div id="ramen-container" style="display: none;">
                 <div class="form-group">
-                    <label>Select Base Soup *</label>
+                    <label data-i18n="label_ramen_soup">Select Base Soup *</label>
                     <select id="ramen-soup-choice" class="form-control">
                         <option value="شوربة فاست ترافيل الأصلية">شوربة فاست ترافيل الأصلية</option>
                         <option value="شوربة فاست ترافيل الحارة">شوربة فاست ترافيل الحارة</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Select The Topping *</label>
+                    <label data-i18n="label_ramen_topping">Select The Topping *</label>
                     <select id="ramen-topping-choice" class="form-control">
                         <option value="دجاج بالزبدة والثوم">دجاج بالزبدة والثوم</option>
                         <option value="دجاج حار بجوز الهند">دجاج حار بجوز الهند</option>
@@ -741,7 +814,7 @@
                 </div>
             </div>
 
-            <button onclick="confirmAddWithSide()" style="width:100%; margin-top:10px; padding:12px;">Add Item to Inventory ➔</button>
+            <button onclick="confirmAddWithSide()" style="width:100%; margin-top:10px; padding:12px;" data-i18n="add_to_inventory_btn">Add Item to Inventory ➔</button>
         </div>
     </div>
 
@@ -750,16 +823,16 @@
         <div class="modal-content" style="max-width: 400px; height: 80vh; display: flex; flex-direction: column; justify-content: space-between;">
             <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a080c; padding-bottom: 10px; margin-bottom: 14px;">
-                    <h3 class="section-title" style="font-size: 1.05rem; margin:0;"><span>🛒</span><span>Quest Inventory Basket</span></h3>
+                    <h3 class="section-title" style="font-size: 1.05rem; margin:0;"><span>🛒</span><span data-i18n="cart_basket_title">Quest Inventory Basket</span></h3>
                     <button class="close-modal" onclick="closeCartDrawer()">&times;</button>
                 </div>
                 <div id="cart-drawer-items" style="max-height: 48vh; overflow-y: auto; padding-right: 4px;"></div>
             </div>
             <div>
                 <div class="summary-box">
-                    <div class="summary-row"><span>Inventory Subtotal</span><span id="drawer-subtotal">0.00 EGP</span></div>
+                    <div class="summary-row"><span data-i18n="inventory_subtotal">Inventory Subtotal</span><span id="drawer-subtotal">0.00 EGP</span></div>
                 </div>
-                <button onclick="closeCartDrawer(); window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});" style="width:100%; margin-top:10px; padding:12px;">Proceed to Checkout Form ➔</button>
+                <button onclick="closeCartDrawer(); window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});" style="width:100%; margin-top:10px; padding:12px;" data-i18n="proceed_checkout">Proceed to Checkout Form ➔</button>
             </div>
         </div>
     </div>
@@ -768,21 +841,181 @@
     <div id="success-modal" class="modal-overlay">
         <div class="modal-content" style="text-align:center;">
             <div style="font-size: 2.2rem; margin-bottom: 10px;">✅</div>
-            <h3 style="font-family:'Orbitron',sans-serif; font-size:1.25rem; color:#fff; margin-bottom:6px;">Order Successfully Submitted!</h3>
-            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">Your Order are transmitted directly to Our Restaurant.</p>
+            <h3 style="font-family:'Orbitron',sans-serif; font-size:1.25rem; color:#fff; margin-bottom:6px;" data-i18n="order_success_title">Order Successfully Submitted!</h3>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;" data-i18n="order_success_desc">Your Order are transmitted directly to Our Restaurant.</p>
             
             <div style="background:#12121a; border:1px solid #2a080c; padding:12px; border-radius:10px; text-align:left; margin-bottom:14px;">
-                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:6px;"><span style="color:var(--text-muted);">Order ID:</span> <span id="modal-order-id" style="font-family:monospace; color:var(--primary-red); font-weight:bold;"></span></div>
-                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem;"><span style="color:var(--text-muted);">Status:</span> <span id="modal-order-status" style="background:rgba(255,30,60,0.1); color:var(--primary-red); border:1px solid rgba(255,30,60,0.2); padding:2px 8px; border-radius:6px; font-weight:bold;">Idle</span></div>
+                <div style="display:flex; justify-content:space-between; font-size:0.8rem; margin-bottom:6px;"><span style="color:var(--text-muted);" data-i18n="order_id_label">Order ID:</span> <span id="modal-order-id" style="font-family:monospace; color:var(--primary-red); font-weight:bold;"></span></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem;"><span style="color:var(--text-muted);" data-i18n="order_status_label">Status:</span> <span id="modal-order-status" style="background:rgba(255,30,60,0.1); color:var(--primary-red); border:1px solid rgba(255,30,60,0.2); padding:2px 8px; border-radius:6px; font-weight:bold;">Idle</span></div>
             </div>
 
-            <button onclick="resetAndCloseSuccess()" style="width:100%; padding:12px;">Confirm</button>
+            <button onclick="resetAndCloseSuccess()" style="width:100%; padding:12px;" data-i18n="confirm_btn_modal">Confirm</button>
         </div>
     </div>
 
     <!-- Application Script Logic -->
     <script src="config.js"></script>
     <script>
+        // Localization Dictionaries
+        const translations = {
+            en: {
+                page_title: "Fast Travel Restaurant | Realm Portal & Ordering Hub",
+                brand_title: "FAST TRAVEL RESTAURANT",
+                brand_subtitle: "Quest Complete It's Time To Eat",
+                cart_btn: "Cart",
+                menu_title: "The Menu",
+                cat_all: "All",
+                loading_menu: "Opening dimensional rift to retrieve menu items...",
+                checkout_title: "Quick Checkout Form",
+                label_name: "Full Name *",
+                placeholder_name: "e.g. Mario Player",
+                label_phone: "Phone *",
+                placeholder_phone: "e.g. 01012345678",
+                phone_error: "Invalid Egyptian mobile number format (must start with 010, 011, 012, or 015 and be 11 digits).",
+                label_city: "City *",
+                loading_cities: "Loading cities...",
+                label_area: "Area *",
+                select_city_first: "-- Select City First --",
+                label_address: "Address details *",
+                placeholder_address: "Street name, building number, floor...",
+                label_payment: "Payment Selection *",
+                pay_cod: "Cash on Delivery 💵",
+                pay_card: "Card on Delivery (POS Machine) 💳",
+                subtotal: "Subtotal",
+                delivery_fee: "Delivery Fee",
+                total_amount: "Total Amount",
+                confirm_btn: "Confirm & Dispatch Order 🍴",
+                modal_customize_title: "Customize Item Options",
+                label_side_option: "Select Side Option *",
+                side_rice: "Rice 🍚",
+                side_pasta: "Pasta 🍝",
+                side_fries: "Fries 🍟",
+                side_sandwich: "Sandwich 🥪",
+                label_tender_flavor: "Select Tender Flavor *",
+                label_combo_fries: "1- Fries Selection *",
+                label_combo_drink: "2- Drink Selection *",
+                label_cookie: "3- Cookie Selection *",
+                label_ramen_soup: "Select Base Soup *",
+                label_ramen_topping: "Select The Topping *",
+                add_to_inventory_btn: "Add Item to Inventory ➔",
+                cart_basket_title: "Quest Inventory Basket",
+                inventory_subtotal: "Inventory Subtotal",
+                proceed_checkout: "Proceed to Checkout Form ➔",
+                order_success_title: "Order Successfully Submitted!",
+                order_success_desc: "Your Order are transmitted directly to Our Restaurant.",
+                order_id_label: "Order ID:",
+                order_status_label: "Status:",
+                confirm_btn_modal: "Confirm",
+                available_badge: "Available 🟢",
+                unavailable_badge: "Unavailable 🔴",
+                add_to_cart_btn: "+ Add To Cart",
+                currently_unavailable: "Currently Unavailable ⛔",
+                empty_cart: "No provisions selected yet.",
+                empty_drawer: "Your quest inventory basket is currently empty.",
+                select_city_opt: "-- Select City --",
+                select_area_opt: "-- Select Area --"
+            },
+            ar: {
+                page_title: "مطعم فاست ترافيل | بوابة العوالم ومنصة الطلبات",
+                brand_title: "مطعم فاست ترافيل",
+                brand_subtitle: "انتهت المهمة.. حان وقت الأكل",
+                cart_btn: "السلة",
+                menu_title: "قائمة الطعام",
+                cat_all: "الكل",
+                loading_menu: "جاري فتح البوابة البعدية لاسترجاع أصناف القائمة...",
+                checkout_title: "نموذج الدفع السريع",
+                label_name: "الاسم الكامل *",
+                placeholder_name: "مثل: أحمد محمد",
+                label_phone: "رقم الهاتف *",
+                placeholder_phone: "مثل: 01012345678",
+                phone_error: "رقم هاتف مصري غير صحيح (يجب أن يبدأ بـ 010 أو 011 أو 012 أو 015 ويتكون من 11 رقماً).",
+                label_city: "المحافظة / المدينة *",
+                loading_cities: "جاري تحميل المدن...",
+                label_area: "المنطقة *",
+                select_city_first: "-- اختر المدينه أولاً --",
+                label_address: "تفاصيل العنوان *",
+                placeholder_address: "اسم الشارع، رقم العمارة، الطابق...",
+                label_payment: "طريقة الدفع *",
+                pay_cod: "الدفع عند الاستلام كاش 💵",
+                pay_card: "الدفع بالبطاقة عند الاستلام (ماكينة POS) 💳",
+                subtotal: "المجموع الفرعي",
+                delivery_fee: "رسوم التوصيل",
+                total_amount: "المبلغ الإجمالي",
+                confirm_btn: "تأكيد وإرسال الطلب 🍴",
+                modal_customize_title: "تخصيص خيارات الصنف",
+                label_side_option: "اختر الصنف الجانبي *",
+                side_rice: "أرز 🍚",
+                side_pasta: "باستا 🍝",
+                side_fries: "بطاطس 🍟",
+                side_sandwich: "ساندوتش 🥪",
+                label_tender_flavor: "اختر نكهة التندر *",
+                label_combo_fries: "1- اختر البطاطس *",
+                label_combo_drink: "2- اختر المشروب *",
+                label_cookie: "3- اختر الكوكيز *",
+                label_ramen_soup: "اختر الشوربة الأساسية *",
+                label_ramen_topping: "اختر الإضافة *",
+                add_to_inventory_btn: "إضافة الصنف إلى السلة ➔",
+                cart_basket_title: "سلة مشتريات المهمة",
+                inventory_subtotal: "المجموع الفرعي للمشتريات",
+                proceed_checkout: "الانتقال إلى نموذج الدفع ➔",
+                order_success_title: "تم إرسال الطلب بنجاح!",
+                order_success_desc: "تم إرسال طلبك مباشرة إلى مطعمنا.",
+                order_id_label: "رقم الطلب:",
+                order_status_label: "الحالة:",
+                confirm_btn_modal: "تأكيد",
+                available_badge: "متاح 🟢",
+                unavailable_badge: "غير متاح 🔴",
+                add_to_cart_btn: "+ أضف إلى السلة",
+                currently_unavailable: "غير متاح حالياً ⛔",
+                empty_cart: "لم يتم اختيار أي أصناف بعد.",
+                empty_drawer: "سلة مشترياتك فارغة حالياً.",
+                select_city_opt: "-- اختر المدينة --",
+                select_area_opt: "-- اختر المنطقة --"
+            }
+        };
+
+        let currentLang = 'en';
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ar' : 'en';
+            const htmlRoot = document.getElementById('html-root');
+            const body = document.body;
+            
+            if (currentLang === 'ar') {
+                htmlRoot.setAttribute('dir', 'rtl');
+                body.className = 'lang-ar';
+                document.getElementById('lang-label').innerText = 'English';
+            } else {
+                htmlRoot.setAttribute('dir', 'ltr');
+                body.className = 'lang-en';
+                document.getElementById('lang-label').innerText = 'العربية';
+            }
+
+            applyTranslations();
+            populateCities();
+            renderMenu(activeCategory);
+            updateCartUI();
+        }
+
+        function applyTranslations() {
+            const t = translations[currentLang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) {
+                    el.innerText = t[key];
+                }
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (t[key]) {
+                    el.setAttribute('placeholder', t[key]);
+                }
+            });
+
+            document.getElementById('page-title').innerText = t.page_title;
+        }
+
         const fallbackMenu = [
             { id: "1", name: "Respawn Burger", category: "Burgers", price: 180, description: "Double smashed beef patty, melted cheddar cheese, signature respawn sauce, and crispy onion rings.", available: "TRUE" },
             { id: "2", name: "Boss Level Mega Burger", category: "Burgers", price: 240, description: "Triple beef stack, smoked bacon, jalapeños, cheddar cheese fondue, and spicy checkpoint mayo.", available: "TRUE" },
@@ -864,8 +1097,9 @@
         function populateCities() {
             const citySelect = document.getElementById('cust-city');
             const cities = [...new Set(addressData.map(row => row.City || row.city))].filter(Boolean).sort();
+            const t = translations[currentLang];
             
-            citySelect.innerHTML = '<option value="">-- Select City --</option>' + 
+            citySelect.innerHTML = `<option value="">${t.select_city_opt}</option>` + 
                 cities.map(city => `<option value="${sanitizeHTML(city)}">${sanitizeHTML(city)}</option>`).join('');
         }
 
@@ -873,8 +1107,9 @@
             const citySelect = document.getElementById('cust-city');
             const areaSelect = document.getElementById('cust-area');
             const selectedCity = citySelect.value;
+            const t = translations[currentLang];
 
-            areaSelect.innerHTML = '<option value="">-- Select Area --</option>';
+            areaSelect.innerHTML = `<option value="">${t.select_area_opt}</option>`;
             areaSelect.disabled = true;
             currentDeliveryFee = 0;
             updateCartUI();
@@ -883,7 +1118,7 @@
 
             const filteredAreas = addressData.filter(row => (row.City || row.city) === selectedCity);
             
-            areaSelect.innerHTML = '<option value="">-- Select Area --</option>' + 
+            areaSelect.innerHTML = `<option value="">${t.select_area_opt}</option>` + 
                 filteredAreas.map(row => {
                     const areaName = row.Area || row.area || '';
                     return `<option value="${sanitizeHTML(areaName)}">${sanitizeHTML(areaName)}</option>`;
@@ -937,9 +1172,10 @@
         function renderCategoryFilters() {
             const container = document.getElementById('category-filters');
             const categories = ['all', ...new Set(menuItems.map(i => i.category || 'Burgers'))];
+            const t = translations[currentLang];
             
             container.innerHTML = categories.map(cat => {
-                const displayName = cat === 'all' ? 'All' : cat;
+                const displayName = cat === 'all' ? t.cat_all : cat;
                 const isActive = activeCategory === cat ? 'active' : '';
                 return `<button onclick="filterMenu('${sanitizeHTML(cat)}')" class="cat-btn ${isActive}">${sanitizeHTML(displayName)}</button>`;
             }).join('');
@@ -957,9 +1193,10 @@
         function renderMenu(category) {
             const grid = document.getElementById('menu-grid');
             const filtered = category === 'all' ? menuItems : menuItems.filter(i => (i.category || 'Burgers') === category);
+            const t = translations[currentLang];
             
             if (!filtered || filtered.length === 0) {
-                grid.innerHTML = "<div class='empty-state'>No provisions found in this category dimension.</div>";
+                grid.innerHTML = `<div class='empty-state'>${t.loading_menu}</div>`;
                 return;
             }
 
@@ -967,14 +1204,13 @@
                 let isAvailable = (item.available === "TRUE" || item.available === true || item.available === "1");
                 let cardClass = isAvailable ? "card" : "card unavailable";
                 let badgeHTML = isAvailable 
-                    ? `<div class="availability-badge badge-available">Available 🟢</div>`
-                    : `<div class="availability-badge badge-unavailable">Unavailable 🔴</div>`;
+                    ? `<div class="availability-badge badge-available">${t.available_badge}</div>`
+                    : `<div class="availability-badge badge-unavailable">${t.unavailable_badge}</div>`;
                 
                 let buttonHTML = isAvailable
-                    ? `<button onclick="addToCart(event, '${sanitizeHTML(item.id || item.name)}')" style="width:100%; margin-top:8px;">+ Add To Cart</button>`
-                    : `<button disabled style="width:100%; margin-top:8px;">Currently Unavailable ⛔</button>`;
+                    ? `<button onclick="addToCart(event, '${sanitizeHTML(item.id || item.name)}')" style="width:100%; margin-top:8px;">${t.add_to_cart_btn}</button>`
+                    : `<button disabled style="width:100%; margin-top:8px;">${t.currently_unavailable}</button>`;
 
-                // Dynamically source the image from the local IMG folder using the item's name.
                 let imageName = `IMG/${item.name}.jpg`;
 
                 return `
@@ -1333,6 +1569,7 @@
 
             const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.qty), 0);
             const grandTotal = subtotal > 0 ? subtotal + currentDeliveryFee : 0;
+            const t = translations[currentLang];
 
             document.getElementById('summary-subtotal').innerText = `${subtotal.toFixed(2)} EGP`;
             document.getElementById('summary-delivery').innerText = `${currentDeliveryFee.toFixed(2)} EGP`;
@@ -1341,7 +1578,7 @@
 
             const summaryItemsList = document.getElementById('summary-items-list');
             if (cart.length === 0) {
-                summaryItemsList.innerHTML = '<span style="color: var(--text-muted); font-style: italic;">No provisions selected yet.</span>';
+                summaryItemsList.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">${t.empty_cart}</span>`;
             } else {
                 summaryItemsList.innerHTML = cart.map(item => `
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px dashed #2a080c; padding-bottom: 3px;">
@@ -1353,7 +1590,7 @@
 
             const drawerContainer = document.getElementById('cart-drawer-items');
             if (cart.length === 0) {
-                drawerContainer.innerHTML = '<p class="empty-state">Your quest inventory basket is currently empty.</p>';
+                drawerContainer.innerHTML = `<p class="empty-state">${t.empty_drawer}</p>`;
                 return;
             }
 
