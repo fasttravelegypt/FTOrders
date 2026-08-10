@@ -222,9 +222,29 @@
             gap: 15px;
         }
 
+/* Menu Cards Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
         @media (max-width: 480px) {
             .menu-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .card-body {
+                padding: 10px;
+            }
+            .card-body h3 {
+                font-size: 0.95rem;
+            }
+            .card-body p {
+                font-size: 0.7rem;
+            }
+            .card-img-wrapper {
+                height: 120px;
             }
         }
 
