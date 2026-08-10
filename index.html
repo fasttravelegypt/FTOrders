@@ -1190,47 +1190,52 @@
             renderMenu(category);
         }
 
-        function renderMenu(category) {
-            const grid = document.getElementById('menu-grid');
-            const filtered = category === 'all' ? menuItems : menuItems.filter(i => (i.category || 'Burgers') === category);
-            const t = translations[currentLang];
-            
-            if (!filtered || filtered.length === 0) {
-                grid.innerHTML = `<div class='empty-state'>${t.loading_menu}</div>`;
-                return;
-            }
+function renderMenu(category) {
+    const grid = document.getElementById('menu-grid');
+    const filtered = category === 'all' ? menuItems : menuItems.filter(i => (i.category || 'Burgers') === category);
+    const t = translations[currentLang];
+    
+    if (!filtered || filtered.length === 0) {
+        grid.innerHTML = `<div class='empty-state'>${t.loading_menu}</div>`;
+        return;
+    }
 
-            grid.innerHTML = filtered.map(item => {
-                let isAvailable = (item.available === "TRUE" || item.available === true || item.available === "1");
-                let cardClass = isAvailable ? "card" : "card unavailable";
-                let badgeHTML = isAvailable 
-                    ? `<div class="availability-badge badge-available">${t.available_badge}</div>`
-                    : `<div class="availability-badge badge-unavailable">${t.unavailable_badge}</div>`;
-                
-                let buttonHTML = isAvailable
-                    ? `<button onclick="addToCart(event, '${sanitizeHTML(item.id || item.name)}')" style="width:100%; margin-top:8px;">${t.add_to_cart_btn}</button>`
-                    : `<button disabled style="width:100%; margin-top:8px;">${t.currently_unavailable}</button>`;
+    grid.innerHTML = filtered.map(item => {
+        let isAvailable = (item.available === "TRUE" || item.available === true || item.available === "1");
+        let cardClass = isAvailable ? "card" : "card unavailable";
+        let badgeHTML = isAvailable 
+            ? `<div class="availability-badge badge-available">${t.available_badge}</div>`
+            : `<div class="availability-badge badge-unavailable">${t.unavailable_badge}</div>`;
+        
+        let buttonHTML = isAvailable
+            ? `<button onclick="addToCart(event, '${sanitizeHTML(item.id || item.name)}')" style="width:100%; margin-top:8px;">${t.add_to_cart_btn}</button>`
+            : `<button disabled style="width:100%; margin-top:8px;">${t.currently_unavailable}</button>`;
 
-                let imageName = `IMG/${item.name}.jpg`;
+        let imageName = `IMG/${item.name}.jpg`;
 
-                return `
-                    <div class="${cardClass}">
-                        <div class="card-img-wrapper">
-                            <img src="${sanitizeHTML(imageName)}" alt="${sanitizeHTML(item.name || '')}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'">
-                            ${badgeHTML}
-                            <div class="price-tag">${item.price || '0'} EGP</div>
-                        </div>
-                        <div class="card-body">
-                            <div>
-                                <h3>${sanitizeHTML(item.name || '')}</h3>
-                                <p>${sanitizeHTML(item.description || 'Delicious realm provision prepared with high-grade ingredients.')}</p>
-                            </div>
-                            ${buttonHTML}
-                        </div>
+        // === ADD THIS CODE HERE ===
+        let itemDescription = currentLang === 'en' && item.descriptionEN ? item.descriptionEN : (item.description || '');
+        // ==========================
+
+        return `
+            <div class="${cardClass}">
+                <div class="card-img-wrapper">
+                    <img src="${sanitizeHTML(imageName)}" alt="${sanitizeHTML(item.name || '')}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'">
+                    ${badgeHTML}
+                    <div class="price-tag">${item.price || '0'} EGP</div>
+                </div>
+                <div class="card-body">
+                    <div>
+                        <h3>${sanitizeHTML(item.name || '')}</h3>
+                        <!-- REPLACE OLD PARAGRAPH WITH THIS -->
+                        <p>${sanitizeHTML(itemDescription)}</p>
                     </div>
-                `;
-            }).join('');
-        }
+                    ${buttonHTML}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
         function playFlyToCartAnimation(event) {
             const button = event.target;
