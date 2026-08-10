@@ -1213,9 +1213,9 @@ function renderMenu(category) {
 
         let imageName = `IMG/${item.name}.jpg`;
 
-        // === ADD THIS CODE HERE ===
+        // Determine item name and description based on current language
+        let itemName = currentLang === 'en' && item.nameEN ? item.nameEN : (item.name || '');
         let itemDescription = currentLang === 'en' && item.descriptionEN ? item.descriptionEN : (item.description || '');
-        // ==========================
 
         return `
             <div class="${cardClass}">
@@ -1226,8 +1226,7 @@ function renderMenu(category) {
                 </div>
                 <div class="card-body">
                     <div>
-                        <h3>${sanitizeHTML(item.name || '')}</h3>
-                        <!-- REPLACE OLD PARAGRAPH WITH THIS -->
+                        <h3>${sanitizeHTML(itemName)}</h3>
                         <p>${sanitizeHTML(itemDescription)}</p>
                     </div>
                     ${buttonHTML}
@@ -1236,7 +1235,6 @@ function renderMenu(category) {
         `;
     }).join('');
 }
-
         function playFlyToCartAnimation(event) {
             const button = event.target;
             const cardImg = button.closest('.card').querySelector('img');
