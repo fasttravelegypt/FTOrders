@@ -222,13 +222,6 @@
             gap: 15px;
         }
 
-/* Menu Cards Grid */
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 15px;
-        }
-
         @media (max-width: 480px) {
             .menu-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -376,7 +369,7 @@
             padding: 10px 12px;
             border-radius: 8px;
             font-family: 'Rajdhani', sans-serif;
-            font-size: 1rem; /* Prevents iOS auto-zoom on input focus */
+            font-size: 1rem;
             outline: none;
             transition: 0.3s;
         }
@@ -791,25 +784,25 @@
     <script src="config.js"></script>
     <script>
         const fallbackMenu = [
-            { id: "1", name: "Respawn Burger", category: "Burgers", price: 180, description: "Double smashed beef patty, melted cheddar cheese, signature respawn sauce, and crispy onion rings.", image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "2", name: "Boss Level Mega Burger", category: "Burgers", price: 240, description: "Triple beef stack, smoked bacon, jalapeños, cheddar cheese fondue, and spicy checkpoint mayo.", image: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "3", name: "Pixel Chicken Sandwich", category: "Burgers", price: 165, description: "Crispy fried buttermilk chicken breast, coleslaw, pickles, and honey-mustard glaze.", image: "https://images.unsplash.com/photo-1606755962773-d324e0a13086?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "18", name: "كومبو", category: "Combos", price: 210, description: "Delicious combo meal with customizable fries and drink selections.", image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "19", name: "سوبر كومبو", category: "Combos", price: 260, description: "Super combo meal with customizable fries, drink, and cookie selections.", image: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "8", name: "مايتي تندر فردي", category: "Mighty Tender", price: 150, description: "Single Mighty Tender meal served with 1 side and 1 tender flavor.", image: "https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "9", name: "مايتي تندر سوبر", category: "Mighty Tender", price: 180, description: "Super Mighty Tender meal served with 1 side and 1 tender flavor.", image: "https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "10", name: "مايتي تندر ديو", category: "Mighty Tender", price: 220, description: "Duo Mighty Tender meal with 4 pcs, 2 sides and 2 flavors (each flavor assigned to 2 pieces).", image: "https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "11", name: "مايتي تندر تريبل", category: "Mighty Tender", price: 280, description: "Triple Mighty Tender meal with 6 pcs, 3 sides and 3 flavors (each flavor assigned to 2 pieces).", image: "https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "12", name: "مايتي تندر كوادرو", category: "Mighty Tender", price: 340, description: "Quadro Mighty Tender meal with 8 pcs, 4 sides and 4 flavors (each flavor assigned to 2 pieces).", image: "https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "13", name: "فاست ترافيل رامين", category: "Ramen", price: 190, description: "Signature handcrafted ramen served with choice of base soup and custom topping.", image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "14", name: "باكيت بطاطس", category: "Sides", price: 45, description: "Crispy french fries packet with customizable seasoning option.", image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "15", name: "طبق باستا", category: "Sides", price: 65, description: "Savory pasta plate with your choice of flavor style.", image: "https://images.unsplash.com/photo-1621996346565-e3d5d6281298?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "16", name: "طبق أرز", category: "Sides", price: 50, description: "Fluffy seasoned rice plate with custom flavor profile.", image: "https://images.unsplash.com/photo-1516684732162-798a0062be99?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "17", name: "صوص التندر", category: "Sides", price: 25, description: "Signature tender dipping sauce with your preferred flavor style.", image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "4", name: "Power-Up Fries", category: "Sides", price: 65, description: "Golden crispy french fries loaded with melted cheese sauce, crushed bacon bits, and spring onions.", image: "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "5", name: "XP Onion Rings", category: "Sides", price: 55, description: "Crispy battered sweet onion rings served with our legendary house special dipping sauce.", image: "https://images.unsplash.com/photo-1639024471283-03518883512d?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "6", name: "Mana Potion Soda", category: "Drinks", price: 35, description: "Refreshing blue raspberry energy soda guaranteed to restore your mental stamina.", image: "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&w=600&q=80", available: "TRUE" },
-            { id: "7", name: "Health Elixir Cola", category: "Drinks", price: 30, description: "Classic sparkling ice-cold cola served with crushed ice and a lemon wedge.", image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=600&q=80", available: "TRUE" }
+            { id: "1", name: "Respawn Burger", category: "Burgers", price: 180, description: "Double smashed beef patty, melted cheddar cheese, signature respawn sauce, and crispy onion rings.", available: "TRUE" },
+            { id: "2", name: "Boss Level Mega Burger", category: "Burgers", price: 240, description: "Triple beef stack, smoked bacon, jalapeños, cheddar cheese fondue, and spicy checkpoint mayo.", available: "TRUE" },
+            { id: "3", name: "Pixel Chicken Sandwich", category: "Burgers", price: 165, description: "Crispy fried buttermilk chicken breast, coleslaw, pickles, and honey-mustard glaze.", available: "TRUE" },
+            { id: "18", name: "كومبو", category: "Combos", price: 210, description: "Delicious combo meal with customizable fries and drink selections.", available: "TRUE" },
+            { id: "19", name: "سوبر كومبو", category: "Combos", price: 260, description: "Super combo meal with customizable fries, drink, and cookie selections.", available: "TRUE" },
+            { id: "8", name: "مايتي تندر فردي", category: "Mighty Tender", price: 150, description: "Single Mighty Tender meal served with 1 side and 1 tender flavor.", available: "TRUE" },
+            { id: "9", name: "مايتي تندر سوبر", category: "Mighty Tender", price: 180, description: "Super Mighty Tender meal served with 1 side and 1 tender flavor.", available: "TRUE" },
+            { id: "10", name: "مايتي تندر ديو", category: "Mighty Tender", price: 220, description: "Duo Mighty Tender meal with 4 pcs, 2 sides and 2 flavors (each flavor assigned to 2 pieces).", available: "TRUE" },
+            { id: "11", name: "مايتي تندر تريبل", category: "Mighty Tender", price: 280, description: "Triple Mighty Tender meal with 6 pcs, 3 sides and 3 flavors (each flavor assigned to 2 pieces).", available: "TRUE" },
+            { id: "12", name: "مايتي تندر كوادرو", category: "Mighty Tender", price: 340, description: "Quadro Mighty Tender meal with 8 pcs, 4 sides and 4 flavors (each flavor assigned to 2 pieces).", available: "TRUE" },
+            { id: "13", name: "فاست ترافيل رامين", category: "Ramen", price: 190, description: "Signature handcrafted ramen served with choice of base soup and custom topping.", available: "TRUE" },
+            { id: "14", name: "باكيت بطاطس", category: "Sides", price: 45, description: "Crispy french fries packet with customizable seasoning option.", available: "TRUE" },
+            { id: "15", name: "طبق باستا", category: "Sides", price: 65, description: "Savory pasta plate with your choice of flavor style.", available: "TRUE" },
+            { id: "16", name: "طبق أرز", category: "Sides", price: 50, description: "Fluffy seasoned rice plate with custom flavor profile.", available: "TRUE" },
+            { id: "17", name: "صوص التندر", category: "Sides", price: 25, description: "Signature tender dipping sauce with your preferred flavor style.", available: "TRUE" },
+            { id: "4", name: "Power-Up Fries", category: "Sides", price: 65, description: "Golden crispy french fries loaded with melted cheese sauce, crushed bacon bits, and spring onions.", available: "TRUE" },
+            { id: "5", name: "XP Onion Rings", category: "Sides", price: 55, description: "Crispy battered sweet onion rings served with our legendary house special dipping sauce.", available: "TRUE" },
+            { id: "6", name: "Mana Potion Soda", category: "Drinks", price: 35, description: "Refreshing blue raspberry energy soda guaranteed to restore your mental stamina.", available: "TRUE" },
+            { id: "7", name: "Health Elixir Cola", category: "Drinks", price: 30, description: "Classic sparkling ice-cold cola served with crushed ice and a lemon wedge.", available: "TRUE" }
         ];
 
         let menuItems = [];
@@ -981,10 +974,13 @@
                     ? `<button onclick="addToCart(event, '${sanitizeHTML(item.id || item.name)}')" style="width:100%; margin-top:8px;">+ Add To Cart</button>`
                     : `<button disabled style="width:100%; margin-top:8px;">Currently Unavailable ⛔</button>`;
 
+                // Dynamically source the image from the local IMG folder using the item's name.
+                let imageName = `IMG/${item.name}.jpg`;
+
                 return `
                     <div class="${cardClass}">
                         <div class="card-img-wrapper">
-                            <img src="${sanitizeHTML(item.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400')}" alt="${sanitizeHTML(item.name || '')}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'">
+                            <img src="${sanitizeHTML(imageName)}" alt="${sanitizeHTML(item.name || '')}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'">
                             ${badgeHTML}
                             <div class="price-tag">${item.price || '0'} EGP</div>
                         </div>
