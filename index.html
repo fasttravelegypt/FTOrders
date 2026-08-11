@@ -580,10 +580,10 @@
 </head>
 <body class="lang-en">
 
-    <!-- Navigation Header -->
+<!-- Navigation Header -->
     <header>
         <div class="brand-container">
-            <img src="crystal-emblem.png" alt="Realm Portal Crystal" class="portal-emblem" title="Realm Portal">
+            <img src="crystal-emblem.png" alt="Realm Portal Crystal" class="portal-emblem" title="Realm Portal" loading="lazy" decoding="async" width="36" height="48">
             <div class="brand-title">
                 <h1 data-i18n="brand_title">FAST TRAVEL RESTAURANT</h1>
                 <p data-i18n="brand_subtitle">Quest Complete It's Time To Eat</p>
@@ -1217,13 +1217,14 @@ function renderMenu(category) {
         let itemName = currentLang === 'en' && item.nameEN ? item.nameEN : (item.name || '');
         let itemDescription = currentLang === 'en' && item.descriptionEN ? item.descriptionEN : (item.description || '');
 
-        return `
+return `
             <div class="${cardClass}">
                 <div class="card-img-wrapper">
-                    <img src="${sanitizeHTML(imageName)}" alt="${sanitizeHTML(item.name || '')}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'">
+                    <img src="${sanitizeHTML(imageName)}" alt="${sanitizeHTML(item.name || '')}" loading="lazy" decoding="async" width="400" height="300" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'">
                     ${badgeHTML}
                     <div class="price-tag">${item.price || '0'} EGP</div>
                 </div>
+
                 <div class="card-body">
                     <div>
                         <h3>${sanitizeHTML(itemName)}</h3>
