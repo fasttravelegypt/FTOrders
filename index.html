@@ -1636,80 +1636,93 @@ return `
         function openCartDrawer() { document.getElementById('cart-modal').style.display = 'flex'; }
         function closeCartDrawer() { document.getElementById('cart-modal').style.display = 'none'; }
 
-        async function submitOrder(e) {
-            e.preventDefault();
+async function submitOrder(e) {
+    e.preventDefault();
 
-            const phoneInput = document.getElementById('cust-phone');
-            const phoneRegex = /^01[0125][0-9]{8}$/;
-            if (!phoneRegex.test(phoneInput.value)) {
-                alert("Please enter a valid Egyptian mobile number starting with 010, 011, 012, or 015 consisting of 11 digits.");
-                phoneInput.focus();
-                return;
-            }
-            if (cart.length === 0) {
-                alert("Please add at least one provision to your basket before ordering.");
-                return;
-            }
+    const phoneInput = document.getElementById('cust-phone');
+    const phoneRegex = /^01[0125][0-9]{8}$/;
+    if (!phoneRegex.test(phoneInput.value)) {
+        alert("Please enter a valid Egyptian mobile number starting with 010, 011, 012, or 015 consisting of 11 digits.");
+        phoneInput.focus();
+        return;
+    }
+    if (cart.length === 0) {
+        alert("Please add at least one provision to your basket before ordering.");
+        return;
+    }
 
-            const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.qty), 0);
-            const minimumOrderAmount = 200;
+    const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.qty), 0);
+    const minimumOrderAmount = 200;
 
-            if (subtotal < minimumOrderAmount) {
-                alert(`The minimum order amount for delivery is ${minimumOrderAmount} EGP (excluding delivery fee). Your current subtotal is ${subtotal.toFixed(2)} EGP.`);
-                return;
-            }
+    if (subtotal < minimumOrderAmount) {
+        alert(`The minimum order amount for delivery is ${minimumOrderAmount} EGP (excluding delivery fee). Your current subtotal is ${subtotal.toFixed(2)} EGP.`);
+        return;
+    }
 
-            const city = document.getElementById('cust-city').value;
-            const area = document.getElementById('cust-area').value;
-            const street = document.getElementById('cust-street').value;
-            const fullAddress = `${city}, ${area} - ${street}`;
+    // --- DOUBLE CLICK / DUPLICATE PROTECTION ---
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn.disabled) return; // Prevent any secondary clicks while processing
+    submitBtn.disabled = true;
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.innerHTML = currentLang === 'ar' ? 'جاري إرسال الطلب... ⏳' : 'Dispatching Order... ⏳';
 
-            const formattedItemsString = cart.map(item => `${item.displayName} (x${item.qty})`).join(' | ');
+    const city = document.getElementById('cust-city').value;
+    const area = document.getElementById('cust-area').value;
+    const street = document.getElementById('cust-street').value;
+    const fullAddress = `${city}, ${area} - ${street}`;
 
-            const orderId = "FTR-" + Math.floor(100000 + Math.random() * 900000);
-            const orderPayload = {
-                orderId: orderId,
-                OrderID: orderId,
-                name: document.getElementById('cust-name').value,
-                CustomerName: document.getElementById('cust-name').value,
-                phone: document.getElementById('cust-phone').value,
-                CustomerPhone: document.getElementById('cust-phone').value,
-                address: fullAddress,
-                City: city,
-                Area: area,
-                District: area,
-                Street: street,
-                payment: document.getElementById('cust-payment').value,
-                items: cart,
-                Items: formattedItemsString,
-                total: document.getElementById('summary-total').innerText,
-                Total: document.getElementById('summary-total').innerText.replace(" EGP", ""),
-                status: 'Idle',
-                Status: 'Idle',
-                timestamp: new Date().toISOString()
-            };
+    const formattedItemsString = cart.map(item => `${item.displayName} (x${item.qty})`).join(' | ');
 
-            try {
-                const raw = localStorage.getItem('fast_travel_orders');
-                const orders = raw ? JSON.parse(raw) : [];
-                orders.push(orderPayload);
-                localStorage.setItem('fast_travel_orders', JSON.stringify(orders));
-            } catch (err) {}
+    const orderId = "FTR-" + Math.floor(100000 + Math.random() * 900000);
+    const orderPayload = {
+        orderId: orderId,
+        OrderID: orderId,
+        name: document.getElementById('cust-name').value,
+        CustomerName: document.getElementById('cust-name').value,
+        phone: document.getElementById('cust-phone').value,
+        CustomerPhone: document.getElementById('cust-phone').value,
+        address: fullAddress,
+        City: city,
+        Area: area,
+        District: area,
+        Street: street,
+        payment: document.getElementById('cust-payment').value,
+        items: cart,
+        Items: formattedItemsString,
+        total: document.getElementById('summary-total').innerText,
+        Total: document.getElementById('summary-total').innerText.replace(" EGP", ""),
+        status: 'Idle',
+        Status: 'Idle',
+        timestamp: new Date().toISOString()
+    };
 
-            try {
-                await fetch(CONFIG.API_URL, {
-                    method: "POST",
-                    body: JSON.stringify({ action: "placeOrder", order: orderPayload })
-                });
-            } catch (err) {}
+    try {
+        const raw = localStorage.getItem('fast_travel_orders');
+        const orders = raw ? JSON.parse(raw) : [];
+        orders.push(orderPayload);
+        localStorage.setItem('fast_travel_orders', JSON.stringify(orders));
+    } catch (err) {}
 
-            activeTrackingOrderId = orderId;
-            document.getElementById('modal-order-id').innerText = orderId;
-            document.getElementById('success-modal').style.display = 'flex';
+    try {
+        await fetch(CONFIG.API_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "placeOrder", order: orderPayload })
+        });
+    } catch (err) {
+        console.error("API network error during order dispatch", err);
+    }
 
-            if (statusPollInterval) clearInterval(statusPollInterval);
-            statusPollInterval = setInterval(pollOrderStatus, 3000);
-        }
+    // Restore button state after completion
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalBtnText;
+
+    activeTrackingOrderId = orderId;
+    document.getElementById('modal-order-id').innerText = orderId;
+    document.getElementById('success-modal').style.display = 'flex';
+
+    if (statusPollInterval) clearInterval(statusPollInterval);
+    statusPollInterval = setInterval(pollOrderStatus, 3000);
+}
 
         function pollOrderStatus() {
             if (!activeTrackingOrderId) return;
