@@ -1067,18 +1067,26 @@
                 .replace(/'/g, '&#039;');
         }
 
-        async function loadAddressData() {
-            try {
-                let res = await fetch(CONFIG.API_URL + "?action=getAddress");
-                let data = await res.json();
-                if (data && data.length > 0) {
-                    addressData = data;
-                    populateCities();
-                }
-            } catch (err) {
-                console.error("Failed to fetch address data from sheet", err);
-            }
+async function loadAddressData() {
+    try {
+        let res = await fetch(CONFIG.API_URL + "?action=getAddress");
+        let json = await res.json();
+        
+        // Handle both direct arrays and object-wrapped responses (e.g. { data: [...] } or { records: [...] })
+        let data = Array.isArray(json) ? json : (json.data || json.records || json.result || []);
+
+        if (data && data.length > 0) {
+            addressData = data;
+            populateCities();
+        } else {
+            console.error("Address data returned empty or unrecognized format:", json);
+            document.getElementById('cust-city').innerHTML = '<option value="">-- Error Loading Cities --</option>';
         }
+    } catch (err) {
+        console.error("Failed to fetch address data from sheet", err);
+        document.getElementById('cust-city').innerHTML = '<option value="">-- Failed to Load Cities --</option>';
+    }
+}
 
         function validateEgyptianPhone(inputElement) {
             const phoneRegex = /^01[0125][0-9]{8}$/;
@@ -1095,37 +1103,47 @@
             }
         }
 
-        function populateCities() {
-            const citySelect = document.getElementById('cust-city');
-            const cities = [...new Set(addressData.map(row => row.City || row.city))].filter(Boolean).sort();
-            const t = translations[currentLang];
-            
-            citySelect.innerHTML = `<option value="">${t.select_city_opt}</option>` + 
-                cities.map(city => `<option value="${sanitizeHTML(city)}">${sanitizeHTML(city)}</option>`).join('');
-        }
+function populateCities() {
+    const citySelect = document.getElementById('cust-city');
+    
+    // Extract unique cities safely checking multiple common key formats
+    const cities = [...new Set(addressData.map(row => row.City || row.city || row.CITY))].filter(Boolean).sort();
+    const t = translations[currentLang];
+    
+    if (cities.length === 0) {
+        citySelect.innerHTML = `<option value="">-- No Cities Found --</option>`;
+        return;
+    }
 
-        function onCityChange() {
-            const citySelect = document.getElementById('cust-city');
-            const areaSelect = document.getElementById('cust-area');
-            const selectedCity = citySelect.value;
-            const t = translations[currentLang];
+    citySelect.innerHTML = `<option value="">${t.select_city_opt}</option>` + 
+        cities.map(city => `<option value="${sanitizeHTML(city)}">${sanitizeHTML(city)}</option>`).join('');
+}
 
-            areaSelect.innerHTML = `<option value="">${t.select_area_opt}</option>`;
-            areaSelect.disabled = true;
-            currentDeliveryFee = 0;
-            updateCartUI();
+function onCityChange() {
+    const citySelect = document.getElementById('cust-city');
+    const areaSelect = document.getElementById('cust-area');
+    const selectedCity = citySelect.value;
+    const t = translations[currentLang];
 
-            if (!selectedCity) return;
+    areaSelect.innerHTML = `<option value="">${t.select_area_opt}</option>`;
+    areaSelect.disabled = true;
+    currentDeliveryFee = 0;
+    updateCartUI();
 
-            const filteredAreas = addressData.filter(row => (row.City || row.city) === selectedCity);
-            
-            areaSelect.innerHTML = `<option value="">${t.select_area_opt}</option>` + 
-                filteredAreas.map(row => {
-                    const areaName = row.Area || row.area || '';
-                    return `<option value="${sanitizeHTML(areaName)}">${sanitizeHTML(areaName)}</option>`;
-                }).join('');
-            areaSelect.disabled = false;
-        }
+    if (!selectedCity) return;
+
+    const filteredAreas = addressData.log ? addressData : addressData.filter(row => {
+        const rowCity = row.City || row.city || row.CITY;
+        return rowCity === selectedCity;
+    });
+    
+    areaSelect.innerHTML = `<option value="">${t.select_area_opt}</option>` + 
+        filteredAreas.map(row => {
+            const areaName = row.Area || row.area || row.AREA || '';
+            return `<option value="${sanitizeHTML(areaName)}">${sanitizeHTML(areaName)}</option>`;
+        }).join('');
+    areaSelect.disabled = false;
+}
 
         function onAreaChange() {
             const citySelect = document.getElementById('cust-city').value;
