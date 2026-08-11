@@ -327,7 +327,7 @@
             background: rgba(43, 12, 16, 0.9);
             backdrop-filter: blur(4px);
             border: 1px solid #ff1e3c44;
-            color: #ffffff;
+            color: #ffffff;;
             font-family: 'Orbitron', sans-serif;
             font-weight: 700;
             padding: 3px 8px;
@@ -1031,27 +1031,7 @@
             document.getElementById('page-title').innerText = t.page_title;
         }
 
-        const fallbackMenu = [
-            { id: "1", name: "Respawn Burger", category: "Burgers", price: 180, description: "Double smashed beef patty, melted cheddar cheese, signature respawn sauce, and crispy onion rings.", available: "TRUE" },
-            { id: "2", name: "Boss Level Mega Burger", category: "Burgers", price: 240, description: "Triple beef stack, smoked bacon, jalapeños, cheddar cheese fondue, and spicy checkpoint mayo.", available: "TRUE" },
-            { id: "3", name: "Pixel Chicken Sandwich", category: "Burgers", price: 165, description: "Crispy fried buttermilk chicken breast, coleslaw, pickles, and honey-mustard glaze.", available: "TRUE" },
-            { id: "18", name: "كومبو", category: "Combos", price: 210, description: "Delicious combo meal with customizable fries and drink selections.", available: "TRUE" },
-            { id: "19", name: "سوبر كومبو", category: "Combos", price: 260, description: "Super combo meal with customizable fries, drink, and cookie selections.", available: "TRUE" },
-            { id: "8", name: "مايتي تندر فردي", category: "Mighty Tender", price: 150, description: "Single Mighty Tender meal served with 1 side and 1 tender flavor.", available: "TRUE" },
-            { id: "9", name: "مايتي تندر سوبر", category: "Mighty Tender", price: 180, description: "Super Mighty Tender meal served with 1 side and 1 tender flavor.", available: "TRUE" },
-            { id: "10", name: "مايتي تندر ديو", category: "Mighty Tender", price: 220, description: "Duo Mighty Tender meal with 4 pcs, 2 sides and 2 flavors (each flavor assigned to 2 pieces).", available: "TRUE" },
-            { id: "11", name: "مايتي تندر تريبل", category: "Mighty Tender", price: 280, description: "Triple Mighty Tender meal with 6 pcs, 3 sides and 3 flavors (each flavor assigned to 2 pieces).", available: "TRUE" },
-            { id: "12", name: "مايتي تندر كوادرو", category: "Mighty Tender", price: 340, description: "Quadro Mighty Tender meal with 8 pcs, 4 sides and 4 flavors (each flavor assigned to 2 pieces).", available: "TRUE" },
-            { id: "13", name: "فاست ترافيل رامين", category: "Ramen", price: 190, description: "Signature handcrafted ramen served with choice of base soup and custom topping.", available: "TRUE" },
-            { id: "14", name: "باكيت بطاطس", category: "Sides", price: 45, description: "Crispy french fries packet with customizable seasoning option.", available: "TRUE" },
-            { id: "15", name: "طبق باستا", category: "Sides", price: 65, description: "Savory pasta plate with your choice of flavor style.", available: "TRUE" },
-            { id: "16", name: "طبق أرز", category: "Sides", price: 50, description: "Fluffy seasoned rice plate with custom flavor profile.", available: "TRUE" },
-            { id: "17", name: "صوص التندر", category: "Sides", price: 25, description: "Signature tender dipping sauce with your preferred flavor style.", available: "TRUE" },
-            { id: "4", name: "Power-Up Fries", category: "Sides", price: 65, description: "Golden crispy french fries loaded with melted cheese sauce, crushed bacon bits, and spring onions.", available: "TRUE" },
-            { id: "5", name: "XP Onion Rings", category: "Sides", price: 55, description: "Crispy battered sweet onion rings served with our legendary house special dipping sauce.", available: "TRUE" },
-            { id: "6", name: "Mana Potion Soda", category: "Drinks", price: 35, description: "Refreshing blue raspberry energy soda guaranteed to restore your mental stamina.", available: "TRUE" },
-            { id: "7", name: "Health Elixir Cola", category: "Drinks", price: 30, description: "Classic sparkling ice-cold cola served with crushed ice and a lemon wedge.", available: "TRUE" }
-        ];
+        const fallbackMenu = [];
 
         let menuItems = [];
         let addressData = [];
@@ -1069,7 +1049,7 @@
             updateCartUI();
             setInterval(() => {
                 loadMenu(true);
-            }, 3000);
+            }, 30000);
         });
 
         function sanitizeHTML(str) {
