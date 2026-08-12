@@ -1,5 +1,5 @@
 const CONFIG = {
-  API_URL: "https://script.google.com/macros/s/AKfycbx5jBJMzP6TcRVZXPUY9UVhUdxrqigE6fU8Y_nv_FzTYmEPVTSunj6Z2miHIGCEi3bYkw/exec"
+  API_URL: "https://script.google.com/macros/s/AKfycbxELSqRHF6SyFq3_XVtbBuk90_NqCj8VoHg0s_vFKrcvNSsmCnpCeuBJJfANgu83Cypng/exec"
 };
 
 // Security Utility: Sanitize inputs to prevent XSS attacks
