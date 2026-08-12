@@ -711,7 +711,7 @@
             
             <div id="sides-container">
                 <div class="form-group">
-                    <label data-i18n="label_side_option">Select Side Option *</label>
+                    <label data-i18n="label_side_option">Select Base Option *</label>
                     <select id="meal-side-choice-1" class="form-control">
                         <option value="Rice" data-i18n="side_rice">Rice 🍚</option>
                         <option value="Pasta" data-i18n="side_pasta">Pasta 🍝</option>
@@ -907,7 +907,7 @@
                 total_amount: "Total Amount",
                 confirm_btn: "Confirm & Dispatch Order 🍴",
                 modal_customize_title: "Customize Item Options",
-                label_side_option: "Select Side Option *",
+                label_side_option: "select Base Option *",
                 side_rice: "Rice 🍚",
                 side_pasta: "Pasta 🍝",
                 side_fries: "Fries 🍟",
@@ -1439,7 +1439,7 @@ return `
             for (let i = 1; i <= numSides; i++) {
                 sidesHTML += `
                     <div class="form-group">
-                        <label>Select Side Option #${i} *</label>
+                        <label>select Base Option #${i} *</label>
                         <select id="meal-side-choice-${i}" class="form-control">
                             ${sideOptionsHTML}
                         </select>
