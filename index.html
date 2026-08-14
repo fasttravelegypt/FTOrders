@@ -682,17 +682,23 @@
     <textarea id="cust-notes" rows="2" placeholder="Special instructions, extra sauce, delivery notes..." class="form-control" data-i18n-placeholder="placeholder_notes"></textarea>
 </div>
 
-                    <div class="summary-box">
+<div class="summary-box">
                         <div id="summary-items-list" style="margin-bottom: 10px; font-size: 0.8rem; max-height: 130px; overflow-y: auto; padding-right: 4px;"></div>
 
                         <div class="summary-row">
                             <span data-i18n="subtotal">Subtotal</span>
                             <span id="summary-subtotal">0.00 EGP</span>
                         </div>
+                        <!-- Add this Discount Row -->
+                        <div class="summary-row" id="summary-discount-row" style="display: none; color: var(--success-green);">
+                            <span>Special Discount</span>
+                            <span id="summary-discount">-0.00 EGP</span>
+                        </div>
                         <div class="summary-row">
                             <span data-i18n="delivery_fee">Delivery Fee</span>
                             <span id="summary-delivery">0.00 EGP</span>
                         </div>
+
                         <div class="summary-total">
                             <span data-i18n="total_amount">Total Amount</span>
                             <span id="summary-total">0.00 EGP</span>
@@ -882,6 +888,77 @@
     <!-- Application Script Logic -->
     <script src="config.js"></script>
     <script>
+// List of eligible meals and tenders for the discount
+const DISCOUNT_ELIGIBLE_ITEMS = [
+    "وجبة مولان",
+    "وجبة بيكا",
+    "وجبة لوفي",
+    "وجبة ليفاي",
+    "وجبة لينك",
+    "وجبة شريك",
+    "وجبة كراتوس",
+    "وجبة جوكو",
+    "وجبة سيمبا",
+    "تندر كلاسيك",
+    "تندر الأعشاب",
+    "تندر الأناناس المدخن",
+    "تندر التوابل الحارة",
+    "تندر توابل الشرق"
+];
+
+// Helper function to calculate cart subtotal, discount, and final totals
+function calculateCartTotals() {
+    let rawSubtotal = 0;
+    let eligiblePrices = [];
+
+    // Flatten cart items to evaluate individual meal prices
+    cart.forEach(item => {
+        const itemPrice = parseFloat(item.price || 0);
+        rawSubtotal += itemPrice * item.qty;
+
+        // Check if item matches any eligible meal name
+        const isEligible = DISCOUNT_ELIGIBLE_ITEMS.some(name => 
+            item.name && item.name.trim() === name.trim()
+        );
+
+        if (isEligible) {
+            for (let i = 0; i < item.qty; i++) {
+                eligiblePrices.push(itemPrice);
+            }
+        }
+    });
+
+    // Sort prices ascending to locate the cheapest meal
+    eligiblePrices.sort((a, b) => a - b);
+
+    const mealCount = eligiblePrices.length;
+    let discountRate = 0;
+
+    if (mealCount === 2) discountRate = 0.25;      // 25% OFF cheapest
+    else if (mealCount === 3) discountRate = 0.40; // 40% OFF cheapest
+    else if (mealCount === 4) discountRate = 0.50; // 50% OFF cheapest
+    else if (mealCount === 5) discountRate = 0.75; // 75% OFF cheapest
+    else if (mealCount >= 6) discountRate = 1.00; // 100% FREE cheapest
+
+    let discountAmount = 0;
+    if (mealCount >= 2 && discountRate > 0) {
+        const cheapestPrice = eligiblePrices[0];
+        discountAmount = cheapestPrice * discountRate;
+    }
+
+    const finalSubtotal = Math.max(0, rawSubtotal - discountAmount);
+    const grandTotal = finalSubtotal > 0 ? finalSubtotal + currentDeliveryFee : 0;
+
+    return {
+        rawSubtotal,
+        discountAmount,
+        finalSubtotal,
+        grandTotal,
+        mealCount,
+        discountRate
+    };
+}
+
         // Localization Dictionaries
         const translations = {
             en: {
@@ -1614,51 +1691,61 @@ return `
             updateCartUI();
         }
 
-        function updateCartUI() {
-            const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
-            document.getElementById('cart-badge').innerText = totalCount;
+function updateCartUI() {
+    const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
+    document.getElementById('cart-badge').innerText = totalCount;
 
-            const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.qty), 0);
-            const grandTotal = subtotal > 0 ? subtotal + currentDeliveryFee : 0;
-            const t = translations[currentLang];
+    // Calculate totals using our discount function
+    const totals = calculateCartTotals();
+    const t = translations[currentLang];
 
-            document.getElementById('summary-subtotal').innerText = `${subtotal.toFixed(2)} EGP`;
-            document.getElementById('summary-delivery').innerText = `${currentDeliveryFee.toFixed(2)} EGP`;
-            document.getElementById('summary-total').innerText = `${grandTotal.toFixed(2)} EGP`;
-            document.getElementById('drawer-subtotal').innerText = `${subtotal.toFixed(2)} EGP`;
+    document.getElementById('summary-subtotal').innerText = `${totals.rawSubtotal.toFixed(2)} EGP`;
+    
+    // Display or hide discount row based on eligibility
+    const discountRow = document.getElementById('summary-discount-row');
+    if (totals.discountAmount > 0) {
+        discountRow.style.display = 'flex';
+        document.getElementById('summary-discount').innerText = `-${totals.discountAmount.toFixed(2)} EGP (${(totals.discountRate * 100)}% OFF lowest)`;
+    } else {
+        discountRow.style.display = 'none';
+    }
 
-            const summaryItemsList = document.getElementById('summary-items-list');
-            if (cart.length === 0) {
-                summaryItemsList.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">${t.empty_cart}</span>`;
-            } else {
-                summaryItemsList.innerHTML = cart.map(item => `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px dashed #ff1e3c33; padding-bottom: 3px;">
-                        <span style="color: var(--text-main); font-weight: 500;">${sanitizeHTML(item.displayName)} <span style="color: var(--text-muted); font-size: 0.7rem;">(x${item.qty})</span></span>
-                        <span style="color: var(--primary-red); font-weight: 700;">${(parseFloat(item.price) * item.qty).toFixed(2)} EGP</span>
-                    </div>
-                `).join('');
-            }
+    document.getElementById('summary-delivery').innerText = `${currentDeliveryFee.toFixed(2)} EGP`;
+    document.getElementById('summary-total').innerText = `${totals.grandTotal.toFixed(2)} EGP`;
+    document.getElementById('drawer-subtotal').innerText = `${totals.finalSubtotal.toFixed(2)} EGP`;
 
-            const drawerContainer = document.getElementById('cart-drawer-items');
-            if (cart.length === 0) {
-                drawerContainer.innerHTML = `<p class="empty-state">${t.empty_drawer}</p>`;
-                return;
-            }
+    const summaryItemsList = document.getElementById('summary-items-list');
+    if (cart.length === 0) {
+        summaryItemsList.innerHTML = `<span style="color: var(--text-muted); font-style: italic;">${t.empty_cart}</span>`;
+    } else {
+        summaryItemsList.innerHTML = cart.map(item => `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; border-bottom: 1px dashed #ff1e3c33; padding-bottom: 3px;">
+                <span style="color: var(--text-main); font-weight: 500;">${sanitizeHTML(item.displayName)} <span style="color: var(--text-muted); font-size: 0.7rem;">(x${item.qty})</span></span>
+                <span style="color: var(--primary-red); font-weight: 700;">${(parseFloat(item.price) * item.qty).toFixed(2)} EGP</span>
+            </div>
+        `).join('');
+    }
 
-            drawerContainer.innerHTML = cart.map(item => `
-                <div class="cart-item-row">
-                    <div>
-                        <h4 style="font-size:0.85rem; color:#fff; font-weight:bold;">${sanitizeHTML(item.displayName)}</h4>
-                        <p style="font-size:0.75rem; color:var(--primary-red); font-weight:bold;">${(parseFloat(item.price) * item.qty).toFixed(2)} EGP</p>
-                    </div>
-                    <div class="qty-controls">
-                        <button class="qty-btn" onclick="updateQty('${sanitizeHTML(item.cartKey)}', -1)">-</button>
-                        <span style="font-size:0.85rem; font-weight:bold; width:16px; text-align:center;">${item.qty}</span>
-                        <button class="qty-btn" onclick="updateQty('${sanitizeHTML(item.cartKey)}', 1)">+</button>
-                    </div>
-                </div>
-            `).join('');
-        }
+    const drawerContainer = document.getElementById('cart-drawer-items');
+    if (cart.length === 0) {
+        drawerContainer.innerHTML = `<p class="empty-state">${t.empty_drawer}</p>`;
+        return;
+    }
+
+    drawerContainer.innerHTML = cart.map(item => `
+        <div class="cart-item-row">
+            <div>
+                <h4 style="font-size:0.85rem; color:#fff; font-weight:bold;">${sanitizeHTML(item.displayName)}</h4>
+                <p style="font-size:0.75rem; color:var(--primary-red); font-weight:bold;">${(parseFloat(item.price) * item.qty).toFixed(2)} EGP</p>
+            </div>
+            <div class="qty-controls">
+                <button class="qty-btn" onclick="updateQty('${sanitizeHTML(item.cartKey)}', -1)">-</button>
+                <span style="font-size:0.85rem; font-weight:bold; width:16px; text-align:center;">${item.qty}</span>
+                <button class="qty-btn" onclick="updateQty('${sanitizeHTML(item.cartKey)}', 1)">+</button>
+            </div>
+        </div>
+    `).join('');
+}
 
         function openCartDrawer() { document.getElementById('cart-modal').style.display = 'flex'; }
         function closeCartDrawer() { document.getElementById('cart-modal').style.display = 'none'; }
@@ -1679,11 +1766,11 @@ async function submitOrder(e) {
         return;
     }
 
-    const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.price || 0) * item.qty), 0);
+const totals = calculateCartTotals();
     const minimumOrderAmount = 200;
 
-    if (subtotal < minimumOrderAmount) {
-        alert(`The minimum order amount for delivery is ${minimumOrderAmount} EGP (excluding delivery fee). Your current subtotal is ${subtotal.toFixed(2)} EGP.`);
+    if (totals.finalSubtotal < minimumOrderAmount) {
+        alert(`The minimum order amount for delivery is ${minimumOrderAmount} EGP (excluding delivery fee). Your current discounted subtotal is ${totals.finalSubtotal.toFixed(2)} EGP.`);
         return;
     }
 
