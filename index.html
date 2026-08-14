@@ -677,6 +677,11 @@
                         </select>
                     </div>
 
+<div class="form-group">
+    <label data-i18n="label_notes">Notes on Order</label>
+    <textarea id="cust-notes" rows="2" placeholder="Special instructions, extra sauce, delivery notes..." class="form-control" data-i18n-placeholder="placeholder_notes"></textarea>
+</div>
+
                     <div class="summary-box">
                         <div id="summary-items-list" style="margin-bottom: 10px; font-size: 0.8rem; max-height: 130px; overflow-y: auto; padding-right: 4px;"></div>
 
@@ -902,6 +907,8 @@
                 label_payment: "Payment Selection *",
                 pay_cod: "Cash on Delivery 💵",
                 pay_card: "Card on Delivery (POS Machine) 💳",
+		label_notes: "Notes on Order",
+		placeholder_notes: "Special instructions, extra sauce, delivery notes...",
                 subtotal: "Subtotal",
                 delivery_fee: "Delivery Fee",
                 total_amount: "Total Amount",
@@ -956,6 +963,8 @@
                 select_city_first: "-- اختر المدينه أولاً --",
                 label_address: "تفاصيل العنوان *",
                 placeholder_address: "اسم الشارع، رقم العمارة، الطابق...",
+	 label_notes: "ملاحظات على الطلب",
+	 placeholder_notes: "أي تعليمات خاصة، صوص إضافي، ملاحظات للطيار...",
                 label_payment: "طريقة الدفع *",
                 pay_cod: "الدفع عند الاستلام كاش 💵",
                 pay_card: "الدفع بالبطاقة عند الاستلام (ماكينة POS) 💳",
@@ -1657,6 +1666,7 @@ return `
 async function submitOrder(e) {
     e.preventDefault();
 
+    const notes = document.getElementById('cust-notes').value;
     const phoneInput = document.getElementById('cust-phone');
     const phoneRegex = /^01[0125][0-9]{8}$/;
     if (!phoneRegex.test(phoneInput.value)) {
@@ -1711,7 +1721,9 @@ async function submitOrder(e) {
         Total: document.getElementById('summary-total').innerText.replace(" EGP", ""),
         status: 'Idle',
         Status: 'Idle',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+	notes: notes,       // <--- ADDED
+	Notes: notes        // <--- ADDED
     };
 
     try {
