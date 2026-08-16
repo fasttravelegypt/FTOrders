@@ -752,43 +752,41 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
   .sidebar-panel{border-radius:16px!important;padding:15px!important}
 }
 
-/* Current Offers - horizontal local-image scrolling ad */
+/* Current Offers - full-width image slide */
 .offers-ad {
     overflow: hidden;
     position: relative;
     width: 100%;
     height: 150px;
-    overflow: hidden;
     background: #050505;
     border-top: 1px solid rgba(230, 25, 25, 0.45);
     border-bottom: 1px solid rgba(230, 25, 25, 0.55);
     box-shadow: 0 0 22px rgba(230, 25, 25, 0.16);
     z-index: 40;
+    transition: height .55s cubic-bezier(.4,0,.2,1);
 }
 
 .offers-ad-track {
     display: flex;
     align-items: stretch;
-    width: max-content;
+    width: 100%;
     height: 100%;
-    animation: offersSlideShift 18s cubic-bezier(.4,0,.2,1) infinite;
+    transform: translateX(0);
+    transition: transform .75s cubic-bezier(.65,0,.25,1);
     will-change: transform;
 }
 
 .offer-slide {
-    flex: 0 0 100vw;
-    width: 100vw;
-    max-width: 100vw;
+    flex: 0 0 100%;
+    width: 100%;
+    max-width: 100%;
     box-sizing: border-box;
     position: relative;
-    flex: 0 0 min(520px, 86vw);
-    width: min(520px, 86vw);
     height: 100%;
+    min-width: 100%;
     overflow: hidden;
-    margin-right: 10px;
+    margin: 0;
     background: #101010;
-    border-left: 1px solid rgba(255,255,255,.08);
-    border-right: 1px solid rgba(255,255,255,.08);
 }
 
 .offer-slide::after {
@@ -853,22 +851,6 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
     letter-spacing: 1px;
 }
 
-/* Slide-by-slide movement: each offer stays visible, then shifts smoothly to the next */
-@keyframes offersSlideShift {
-    0%, 27% {
-        transform: translateX(0);
-    }
-    33.333%, 60.333% {
-        transform: translateX(-100vw);
-    }
-    66.666%, 93.666% {
-        transform: translateX(-200vw);
-    }
-    100% {
-        transform: translateX(-300vw);
-    }
-}
-
 body.lang-ar .offer-content {
     align-items: flex-end;
     text-align: right;
@@ -886,26 +868,12 @@ body.lang-ar .offer-description {
 }
 
 .offers-ad:hover .offers-ad-track {
-    animation-play-state: paused;
-}
-
-/* Slight visual depth during each slide transition */
-.offer-slide {
-    transition: filter .45s ease, opacity .45s ease;
-}
-.offers-ad-track {
-    perspective: 900px;
+    /* Keep the current slide in place while hovered. */
 }
 
 @media (max-width: 600px) {
     .offers-ad {
         height: 112px;
-    }
-
-    .offer-slide {
-        flex-basis: 88vw;
-        width: 88vw;
-        margin-right: 7px;
     }
 
     .offer-content {
@@ -1496,11 +1464,70 @@ function calculateCartTotals() {
 
 let localOffers = [];
 
+let localOfferIndex = 0;
+let localOfferTimer = null;
+let localOfferResizeTimer = null;
+
+function setOffersAdHeight(index) {
+    const ad = document.getElementById('offers-ad');
+    const track = document.getElementById('offers-ad-track');
+    if (!ad || !track) return;
+
+    const slides = track.querySelectorAll('.offer-slide');
+    const slide = slides[index];
+    const image = slide ? slide.querySelector('.offer-image') : null;
+
+    if (!image) return;
+
+    const updateHeight = () => {
+        const width = ad.clientWidth;
+        if (!width) return;
+
+        if (image.naturalWidth && image.naturalHeight) {
+            const ratio = image.naturalHeight / image.naturalWidth;
+            ad.style.height = Math.max(1, Math.round(width * ratio)) + 'px';
+        }
+    };
+
+    if (image.complete && image.naturalWidth) {
+        updateHeight();
+    } else {
+        image.addEventListener('load', updateHeight, { once: true });
+    }
+}
+
+function showLocalOffer(index, animate = true) {
+    const track = document.getElementById('offers-ad-track');
+    if (!track || !localOffers.length) return;
+
+    const total = localOffers.length;
+    localOfferIndex = ((index % total) + total) % total;
+
+    track.style.transition = animate
+        ? 'transform .75s cubic-bezier(.65,0,.25,1)'
+        : 'none';
+
+    track.style.transform = `translateX(-${localOfferIndex * 100}%)`;
+
+    setOffersAdHeight(localOfferIndex);
+}
+
+function startLocalOfferSlider() {
+    if (localOfferTimer) clearInterval(localOfferTimer);
+    if (localOffers.length <= 1) return;
+
+    // One complete image is shown at a time, then the next image slides in.
+    localOfferTimer = setInterval(() => {
+        showLocalOffer(localOfferIndex + 1, true);
+    }, 5000);
+}
+
 function renderLocalOffers() {
     const track = document.getElementById('offers-ad-track');
     if (!track || !localOffers.length) return;
 
     const isArabic = document.body.classList.contains('lang-ar');
+
     const slides = localOffers.map(offer => {
         const title = isArabic ? (offer.titleAr || offer.title || '') : (offer.title || '');
         const description = isArabic ? (offer.descriptionAr || offer.description || '') : (offer.description || '');
@@ -1525,9 +1552,19 @@ function renderLocalOffers() {
         `;
     }).join('');
 
-    // Duplicate the same set once so the horizontal animation can loop seamlessly.
-    track.innerHTML = slides + slides;
+    track.innerHTML = slides;
+
+    localOfferIndex = 0;
+    showLocalOffer(0, false);
+    startLocalOfferSlider();
 }
+
+window.addEventListener('resize', () => {
+    clearTimeout(localOfferResizeTimer);
+    localOfferResizeTimer = setTimeout(() => {
+        setOffersAdHeight(localOfferIndex);
+    }, 100);
+});
 
 async function loadLocalOffers() {
     try {
