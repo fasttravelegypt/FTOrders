@@ -1305,14 +1305,11 @@ function calculateCartTotals() {
         let pendingMealItem = null;
         let pendingClickEvent = null;
 
-        window.addEventListener('DOMContentLoaded', () => {
-            loadMenu();
-            loadAddressData();
-            updateCartUI();
-            setInterval(() => {
-                loadMenu(true);
-            }, 3000);
-        });
+window.addEventListener('DOMContentLoaded', () => {
+    loadMenu();
+    loadAddressData();
+    updateCartUI();
+});
 
         function sanitizeHTML(str) {
             return String(str)
