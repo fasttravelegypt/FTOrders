@@ -684,9 +684,59 @@ label{color:#bbb!important;font-size:.76rem!important;letter-spacing:.3px}
   background:rgba(7,7,7,.96)!important;border-color:rgba(230,25,25,.28)!important;box-shadow:0 30px 100px rgba(0,0,0,.7),0 0 40px rgba(230,25,25,.1)!important;backdrop-filter:blur(22px)
 }
 /* Cinematic reveal classes added by visual-effects.js */
-.ft-reveal{opacity:0;transform:translateY(38px) scale(.985);filter:blur(4px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1),filter .8s ease;transition-delay:var(--ft-delay,0ms)}
+.ft-reveal{
+  opacity:0;
+  transform:translateY(38px);
+  filter:blur(4px);
+  transition:
+    opacity .8s cubic-bezier(.2,.7,.2,1),
+    transform .8s cubic-bezier(.2,.7,.2,1),
+    filter .8s ease;
+  transition-delay:var(--ft-delay,0ms);
+}
 /* Stable cinematic reveal: once visible, content stays visible when scrolling back. */
-.ft-reveal.is-visible{opacity:1;transform:none;filter:none}
+.ft-reveal.is-visible{
+  opacity:1;
+  transform:translateY(0);
+  filter:none;
+}
+		/* =========================================================
+   FAST TRAVEL MENU CARD STABILITY
+   Prevent the complete card from scaling during reveal/hover.
+   Only the food image is allowed to zoom.
+   ========================================================= */
+
+.card{
+  transform-origin:center center;
+}
+
+/* Card itself only lifts — it never scales */
+.card:hover{
+  transform:translateY(-6px) !important;
+}
+
+/* Never allow reveal animation to scale the card */
+.card.ft-reveal{
+  transform:translateY(38px);
+}
+
+.card.ft-reveal.is-visible{
+  transform:translateY(0);
+}
+
+/* Keep image zoom separate from card movement */
+.card .card-img-wrapper img,
+.card img{
+  transition:
+    transform .45s cubic-bezier(.2,.7,.2,1),
+    filter .45s ease;
+}
+
+/* Subtle cinematic food-image zoom */
+.card:hover .card-img-wrapper img,
+.card:hover img{
+  transform:scale(1.035);
+}
 /* Do not let dynamic menu rendering create an invisible frame during startup. */
 .ft-reveal.card{will-change:opacity,transform,filter;}
 /* Keep initial loading/menu content visible if JS is blocked */
