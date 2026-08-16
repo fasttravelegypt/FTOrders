@@ -851,16 +851,7 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
     <label data-i18n="label_notes">Notes on Order</label>
     <textarea id="cust-notes" rows="2" placeholder="Special instructions, extra sauce, delivery notes..." class="form-control" data-i18n-placeholder="placeholder_notes"></textarea>
 </div>
-<!-- ADD THIS COUPON BLOCK -->
-<div class="form-group">
-    <label>Coupon Code</label>
-    <div style="display: flex; gap: 8px;">
-        <input type="text" id="cust-coupon" placeholder="Enter coupon..." class="form-control" style="flex: 1; text-transform: uppercase;">
-        <button type="button" onclick="applyCoupon()" class="btn" style="width: auto; padding: 10px 16px;">Apply</button>
-    </div>
-    <small id="coupon-msg" style="display: block; margin-top: 6px; font-size: 0.75rem; font-weight: bold;"></small>
-</div>
-					
+
 <div class="summary-box">
                         <div id="summary-items-list" style="margin-bottom: 10px; font-size: 0.8rem; max-height: 130px; overflow-y: auto; padding-right: 4px;"></div>
 
@@ -873,11 +864,6 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
                             <span>Special Discount</span>
                             <span id="summary-discount">-0.00 EGP</span>
                         </div>
-	<!-- ADD THIS COUPON ROW -->
-<div class="summary-row" id="summary-coupon-row" style="display: none; color: var(--success-green);">
-    <span>Coupon Applied</span>
-    <span id="summary-coupon-amount">-0.00 EGP</span>
-</div>
                         <div class="summary-row">
                             <span data-i18n="delivery_fee">Delivery Fee</span>
                             <span id="summary-delivery">0.00 EGP</span>
@@ -1130,33 +1116,18 @@ function calculateCartTotals() {
         discountAmount = cheapestPrice * discountRate;
     }
 
-let subtotalAfterMeals = Math.max(0, rawSubtotal - discountAmount);
-    
-    // Process new Coupon logic
-    let couponDiscountAmount = 0;
-    if (appliedCoupon) {
-        const type = String(appliedCoupon.type).toLowerCase();
-        const amount = parseFloat(appliedCoupon.amount) || 0;
-        
-        if (type === 'percentage') {
-            couponDiscountAmount = subtotalAfterMeals * (amount / 100);
-        } else {
-            couponDiscountAmount = amount; // fixed
-        }
-    }
-
-    const finalSubtotal = Math.max(0, subtotalAfterMeals - couponDiscountAmount);
+    const finalSubtotal = Math.max(0, rawSubtotal - discountAmount);
     const grandTotal = finalSubtotal > 0 ? finalSubtotal + currentDeliveryFee : 0;
 
     return {
         rawSubtotal,
         discountAmount,
-        couponDiscountAmount, // Added to return object
         finalSubtotal,
         grandTotal,
         mealCount,
         discountRate
     };
+}
 
         // Localization Dictionaries
         const translations = {
@@ -1333,13 +1304,10 @@ let subtotalAfterMeals = Math.max(0, rawSubtotal - discountAmount);
         let statusPollInterval = null;
         let pendingMealItem = null;
         let pendingClickEvent = null;
-		let couponsData = [];
-		let appliedCoupon = null;
 
 window.addEventListener('DOMContentLoaded', () => {
     loadMenu();
     loadAddressData();
-	loadCouponsData();
     updateCartUI();
 });
 
@@ -1352,42 +1320,6 @@ window.addEventListener('DOMContentLoaded', () => {
                 .replace(/'/g, '&#039;');
         }
 
-		async function loadCouponsData() {
-    try {
-        let res = await fetch(CONFIG.API_URL + "?action=getCoupons");
-        let json = await res.json();
-        couponsData = Array.isArray(json) ? json : (json.data || json.records || json.result || []);
-    } catch (err) {
-        console.error("Failed to load coupons", err);
-    }
-}
-
-function applyCoupon() {
-    const codeInput = document.getElementById('cust-coupon').value.trim();
-    const msgEl = document.getElementById('coupon-msg');
-
-    if (!codeInput) {
-        appliedCoupon = null;
-        msgEl.innerText = "";
-        updateCartUI();
-        return;
-    }
-
-    // Match code (case insensitive)
-    const coupon = couponsData.find(c => String(c.code).toUpperCase() === codeInput.toUpperCase());
-
-    if (coupon && (String(coupon.status).toLowerCase() === 'true' || String(coupon.status).toLowerCase() === 'active' || String(coupon.status) === '1')) {
-        appliedCoupon = coupon;
-        msgEl.style.color = "var(--success-green)";
-        msgEl.innerText = `Coupon ${coupon.code.toUpperCase()} applied successfully!`;
-    } else {
-        appliedCoupon = null;
-        msgEl.style.color = "var(--primary-red)";
-        msgEl.innerText = "Invalid or inactive coupon code.";
-    }
-    updateCartUI();
-}
-		
 async function loadAddressData() {
     try {
         let res = await fetch(CONFIG.API_URL + "?action=getAddress");
@@ -1510,9 +1442,7 @@ async function loadMenu(isBackground = false) {
             fetchedItems = data;
             localStorage.setItem('fast_travel_menu', JSON.stringify(fetchedItems));
         }
-} catch (err) {
-    console.error("Failed to fetch menu:", err);
-}
+    } catch (err) {}
 
     if (fetchedItems.length > 0) {
         menuItems = fetchedItems;
@@ -1946,14 +1876,6 @@ function updateCartUI() {
     } else {
         discountRow.style.display = 'none';
     }
-	// Inside updateCartUI(), right below the "summary-discount-row" logic, add:
-    const couponRow = document.getElementById('summary-coupon-row');
-    if (totals.couponDiscountAmount > 0) {
-        couponRow.style.display = 'flex';
-        document.getElementById('summary-coupon-amount').innerText = `-${totals.couponDiscountAmount.toFixed(2)} EGP`;
-    } else {
-        couponRow.style.display = 'none';
-    }
 
     document.getElementById('summary-delivery').innerText = `${currentDeliveryFee.toFixed(2)} EGP`;
     document.getElementById('summary-total').innerText = `${totals.grandTotal.toFixed(2)} EGP`;
@@ -2054,9 +1976,8 @@ const totals = calculateCartTotals();
         status: 'Idle',
         Status: 'Idle',
         timestamp: new Date().toISOString(),
-		notes: notes,       // <--- ADDED
-		Notes: notes,        // <--- ADDED
-		couponCode: appliedCoupon ? appliedCoupon.code : "" // <--- ADD THIS
+	notes: notes,       // <--- ADDED
+	Notes: notes        // <--- ADDED
     };
 
     try {
@@ -2064,9 +1985,7 @@ const totals = calculateCartTotals();
         const orders = raw ? JSON.parse(raw) : [];
         orders.push(orderPayload);
         localStorage.setItem('fast_travel_orders', JSON.stringify(orders));
-} catch (err) {
-    console.error("Failed to fetch menu:", err);
-}
+    } catch (err) {}
 
     try {
         await fetch(CONFIG.API_URL, {
