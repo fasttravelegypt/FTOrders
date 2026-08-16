@@ -817,6 +817,15 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
                         <small id="phone-error" style="color: var(--primary-red); font-size: 0.7rem; display: none; margin-top: 4px;" data-i18n="phone_error">Invalid Egyptian mobile number format (must start with 010, 011, 012, or 015 and be 11 digits).</small>
                     </div>
 
+                    <!-- Order Type Selection -->
+                    <div class="form-group">
+                        <label data-i18n="label_order_type">Order Type *</label>
+                        <select id="order-type" required class="form-control" onchange="onOrderTypeChange()">
+                            <option value="Delivery" data-i18n="order_delivery">Delivery 🚚</option>
+                            <option value="Store Pickup" data-i18n="order_pickup">Store Pickup 🏪</option>
+                        </select>
+                    </div>
+
                     <!-- City Selection -->
                     <div class="form-group">
                         <label data-i18n="label_city">City *</label>
@@ -842,8 +851,8 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
                     <div class="form-group">
                         <label data-i18n="label_payment">Payment Selection *</label>
                         <select id="cust-payment" class="form-control">
-                            <option value="Cash on Delivery" data-i18n="pay_cod">Cash on Delivery 💵</option>
-                            <option value="Card on Delivery (POS)" data-i18n="pay_card">Card on Delivery (POS Machine) 💳</option>
+                            <option value="CASH" data-i18n="pay_cod">CASH 💵</option>
+                            <option value="CARD" data-i18n="pay_card">CARD 💳</option>
                         </select>
                     </div>
 
@@ -1124,7 +1133,9 @@ function calculateCartTotals() {
     }
 
     const finalSubtotal = Math.max(0, rawSubtotal - discountAmount);
-    const beforeCouponTotal = finalSubtotal > 0 ? finalSubtotal + currentDeliveryFee : 0;
+    const orderType = document.getElementById('order-type')?.value || 'Delivery';
+    const deliveryFee = orderType === 'Store Pickup' ? 0 : currentDeliveryFee;
+    const beforeCouponTotal = finalSubtotal > 0 ? finalSubtotal + deliveryFee : 0;
 
     let couponDiscount = 0;
     if (appliedCoupon) {
@@ -1146,6 +1157,7 @@ function calculateCartTotals() {
         beforeCouponTotal,
         couponDiscount,
         grandTotal,
+        deliveryFee,
         mealCount,
         discountRate
     };
@@ -1166,6 +1178,9 @@ function calculateCartTotals() {
                 placeholder_name: "e.g. Mario Player",
                 label_phone: "Phone *",
                 placeholder_phone: "e.g. 01012345678",
+                label_order_type: "Order Type *",
+                order_delivery: "Delivery 🚚",
+                order_pickup: "Store Pickup 🏪",
                 phone_error: "Invalid Egyptian mobile number format (must start with 010, 011, 012, or 015 and be 11 digits).",
                 label_city: "City *",
                 loading_cities: "Loading cities...",
@@ -1174,8 +1189,8 @@ function calculateCartTotals() {
                 label_address: "Address details *",
                 placeholder_address: "Street name, building number, floor...",
                 label_payment: "Payment Selection *",
-                pay_cod: "Cash on Delivery 💵",
-                pay_card: "Card on Delivery (POS Machine) 💳",
+                pay_cod: "CASH 💵",
+                pay_card: "CARD 💳",
 		label_notes: "Notes on Order",
 		placeholder_notes: "Special instructions, extra sauce, delivery notes...",
                 subtotal: "Subtotal",
@@ -1231,6 +1246,9 @@ function calculateCartTotals() {
                 placeholder_name: "مثل: أحمد محمد",
                 label_phone: "رقم الهاتف *",
                 placeholder_phone: "مثل: 01012345678",
+                label_order_type: "نوع الطلب *",
+                order_delivery: "توصيل 🚚",
+                order_pickup: "استلام من المطعم 🏪",
                 phone_error: "رقم هاتف مصري غير صحيح (يجب أن يبدأ بـ 010 أو 011 أو 012 أو 015 ويتكون من 11 رقماً).",
                 label_city: "المحافظة / المدينة *",
                 loading_cities: "جاري تحميل المدن...",
@@ -1344,6 +1362,7 @@ window.addEventListener('DOMContentLoaded', () => {
     loadMenu();
     loadAddressData();
     updateCartUI();
+    onOrderTypeChange();
 });
 
         function sanitizeHTML(str) {
@@ -1405,6 +1424,55 @@ function populateCities() {
 
     citySelect.innerHTML = `<option value="">${t.select_city_opt}</option>` + 
         cities.map(city => `<option value="${sanitizeHTML(city)}">${sanitizeHTML(city)}</option>`).join('');
+}
+
+function onOrderTypeChange() {
+    const orderType = document.getElementById('order-type')?.value || 'Delivery';
+
+    const cityGroup = document.getElementById('cust-city')?.closest('.form-group');
+    const areaGroup = document.getElementById('cust-area')?.closest('.form-group');
+    const streetGroup = document.getElementById('cust-street')?.closest('.form-group');
+
+    const citySelect = document.getElementById('cust-city');
+    const areaSelect = document.getElementById('cust-area');
+    const streetInput = document.getElementById('cust-street');
+
+    const deliverySummary = document.getElementById('summary-delivery');
+    const deliverySummaryRow = deliverySummary ? deliverySummary.closest('.summary-row') : null;
+
+    if (orderType === 'Store Pickup') {
+        if (cityGroup) cityGroup.style.display = 'none';
+        if (areaGroup) areaGroup.style.display = 'none';
+        if (streetGroup) streetGroup.style.display = 'none';
+
+        if (citySelect) citySelect.required = false;
+        if (areaSelect) areaSelect.required = false;
+        if (streetInput) streetInput.required = false;
+
+        if (citySelect) citySelect.value = '';
+        if (areaSelect) areaSelect.value = '';
+        if (streetInput) streetInput.value = '';
+
+        if (areaSelect) areaSelect.disabled = true;
+
+        currentDeliveryFee = 0;
+
+        if (deliverySummaryRow) deliverySummaryRow.style.display = 'none';
+    } else {
+        if (cityGroup) cityGroup.style.display = '';
+        if (areaGroup) areaGroup.style.display = '';
+        if (streetGroup) streetGroup.style.display = '';
+
+        if (citySelect) citySelect.required = true;
+        if (areaSelect) areaSelect.required = true;
+        if (streetInput) streetInput.required = true;
+
+        if (deliverySummaryRow) deliverySummaryRow.style.display = '';
+
+        onAreaChange();
+    }
+
+    updateCartUI();
 }
 
 function onCityChange() {
@@ -1921,7 +1989,14 @@ function updateCartUI() {
         discountRow.style.display = 'none';
     }
 
-    document.getElementById('summary-delivery').innerText = `${currentDeliveryFee.toFixed(2)} EGP`;
+    document.getElementById('summary-delivery').innerText = `${totals.deliveryFee.toFixed(2)} EGP`;
+
+    const orderType = document.getElementById('order-type')?.value || 'Delivery';
+    const deliverySummaryRow = document.getElementById('summary-delivery')?.closest('.summary-row');
+    if (deliverySummaryRow) {
+        deliverySummaryRow.style.display = orderType === 'Store Pickup' ? 'none' : '';
+    }
+
     document.getElementById('summary-total').innerText = `${totals.grandTotal.toFixed(2)} EGP`;
     document.getElementById('drawer-subtotal').innerText = `${totals.finalSubtotal.toFixed(2)} EGP`;
 
@@ -2027,10 +2102,13 @@ const totals = calculateCartTotals();
     const originalBtnText = submitBtn.innerHTML;
     submitBtn.innerHTML = currentLang === 'ar' ? 'جاري إرسال الطلب... ⏳' : 'Dispatching Order... ⏳';
 
+    const orderType = document.getElementById('order-type').value;
     const city = document.getElementById('cust-city').value;
     const area = document.getElementById('cust-area').value;
     const street = document.getElementById('cust-street').value;
-    const fullAddress = `${city}, ${area} - ${street}`;
+    const fullAddress = orderType === 'Store Pickup'
+        ? 'Store Pickup'
+        : `${city}, ${area} - ${street}`;
 
     const formattedItemsString = cart.map(item => `${item.displayName} (x${item.qty})`).join(' | ');
 
@@ -2042,6 +2120,8 @@ const totals = calculateCartTotals();
         CustomerName: document.getElementById('cust-name').value,
         phone: document.getElementById('cust-phone').value,
         CustomerPhone: document.getElementById('cust-phone').value,
+        orderType: orderType,
+        OrderType: orderType,
         address: fullAddress,
         City: city,
         Area: area,
@@ -2105,6 +2185,7 @@ const totals = calculateCartTotals();
             cart = [];
             updateCartUI();
             document.getElementById('checkout-form').reset();
+            onOrderTypeChange();
             document.getElementById('cust-area').innerHTML = '<option value="">-- Select City First --</option>';
             document.getElementById('cust-area').disabled = true;
             currentDeliveryFee = 0;
