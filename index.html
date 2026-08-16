@@ -848,6 +848,15 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
                     </div>
 
 <div class="form-group">
+    <label data-i18n="coupon_label">Coupon Code</label>
+    <div style="display:flex; gap:8px;">
+        <input type="text" id="coupon-code" class="form-control" placeholder="Enter coupon code" data-i18n-placeholder="coupon_placeholder" autocomplete="off" style="flex:1;">
+        <button type="button" id="apply-coupon-btn" onclick="applyCoupon()" data-i18n="apply_coupon" style="white-space:nowrap;">Apply</button>
+    </div>
+    <small id="coupon-message" style="display:none; margin-top:5px; font-size:0.72rem;"></small>
+</div>
+
+<div class="form-group">
     <label data-i18n="label_notes">Notes on Order</label>
     <textarea id="cust-notes" rows="2" placeholder="Special instructions, extra sauce, delivery notes..." class="form-control" data-i18n-placeholder="placeholder_notes"></textarea>
 </div>
@@ -863,6 +872,10 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
                         <div class="summary-row" id="summary-discount-row" style="display: none; color: var(--success-green);">
                             <span>Special Discount</span>
                             <span id="summary-discount">-0.00 EGP</span>
+                        </div>
+                        <div class="summary-row" id="summary-coupon-row" style="display:none; color:var(--success-green);">
+                            <span data-i18n="coupon_discount">Coupon Discount</span>
+                            <span id="summary-coupon-discount">-0.00 EGP</span>
                         </div>
                         <div class="summary-row">
                             <span data-i18n="delivery_fee">Delivery Fee</span>
@@ -1081,48 +1094,57 @@ function calculateCartTotals() {
     let rawSubtotal = 0;
     let eligiblePrices = [];
 
-    // Flatten cart items to evaluate individual meal prices
     cart.forEach(item => {
         const itemPrice = parseFloat(item.price || 0);
         rawSubtotal += itemPrice * item.qty;
 
-        // Check if item matches any eligible meal name
-        const isEligible = DISCOUNT_ELIGIBLE_ITEMS.some(name => 
+        const isEligible = DISCOUNT_ELIGIBLE_ITEMS.some(name =>
             item.name && item.name.trim() === name.trim()
         );
 
         if (isEligible) {
-            for (let i = 0; i < item.qty; i++) {
-                eligiblePrices.push(itemPrice);
-            }
+            for (let i = 0; i < item.qty; i++) eligiblePrices.push(itemPrice);
         }
     });
 
-    // Sort prices ascending to locate the cheapest meal
     eligiblePrices.sort((a, b) => a - b);
 
     const mealCount = eligiblePrices.length;
     let discountRate = 0;
 
-    if (mealCount === 2) discountRate = 0.25;      // 25% OFF cheapest
-    else if (mealCount === 3) discountRate = 0.40; // 40% OFF cheapest
-    else if (mealCount === 4) discountRate = 0.50; // 50% OFF cheapest
-    else if (mealCount === 5) discountRate = 0.75; // 75% OFF cheapest
-    else if (mealCount >= 6) discountRate = 1.00; // 100% FREE cheapest
+    if (mealCount === 2) discountRate = 0.25;
+    else if (mealCount === 3) discountRate = 0.40;
+    else if (mealCount === 4) discountRate = 0.50;
+    else if (mealCount === 5) discountRate = 0.75;
+    else if (mealCount >= 6) discountRate = 1.00;
 
     let discountAmount = 0;
     if (mealCount >= 2 && discountRate > 0) {
-        const cheapestPrice = eligiblePrices[0];
-        discountAmount = cheapestPrice * discountRate;
+        discountAmount = eligiblePrices[0] * discountRate;
     }
 
     const finalSubtotal = Math.max(0, rawSubtotal - discountAmount);
-    const grandTotal = finalSubtotal > 0 ? finalSubtotal + currentDeliveryFee : 0;
+    const beforeCouponTotal = finalSubtotal > 0 ? finalSubtotal + currentDeliveryFee : 0;
+
+    let couponDiscount = 0;
+    if (appliedCoupon) {
+        const amount = parseFloat(appliedCoupon.amount) || 0;
+        if (String(appliedCoupon.type).toLowerCase() === 'percentage') {
+            couponDiscount = beforeCouponTotal * amount / 100;
+        } else if (String(appliedCoupon.type).toLowerCase() === 'fixed') {
+            couponDiscount = amount;
+        }
+        couponDiscount = Math.min(Math.max(0, couponDiscount), beforeCouponTotal);
+    }
+
+    const grandTotal = Math.max(0, beforeCouponTotal - couponDiscount);
 
     return {
         rawSubtotal,
         discountAmount,
         finalSubtotal,
+        beforeCouponTotal,
+        couponDiscount,
         grandTotal,
         mealCount,
         discountRate
@@ -1159,6 +1181,12 @@ function calculateCartTotals() {
                 subtotal: "Subtotal",
                 delivery_fee: "Delivery Fee",
                 total_amount: "Total Amount",
+                coupon_label: "Coupon Code",
+                coupon_placeholder: "Enter coupon code",
+                apply_coupon: "Apply",
+                coupon_invalid: "Invalid or inactive coupon.",
+                coupon_applied: "Coupon applied",
+                coupon_discount: "Coupon Discount",
                 confirm_btn: "Confirm & Dispatch Order 🍴",
                 modal_customize_title: "Customize Item Options",
                 label_side_option: "select Base Option *",
@@ -1218,6 +1246,12 @@ function calculateCartTotals() {
                 subtotal: "المجموع الفرعي",
                 delivery_fee: "رسوم التوصيل",
                 total_amount: "المبلغ الإجمالي",
+                coupon_label: "كود الخصم",
+                coupon_placeholder: "أدخل كود الخصم",
+                apply_coupon: "تطبيق",
+                coupon_invalid: "كود الخصم غير صحيح أو غير فعال.",
+                coupon_applied: "تم تطبيق الكود",
+                coupon_discount: "خصم الكوبون",
                 confirm_btn: "تأكيد وإرسال الطلب 🍴",
                 modal_customize_title: "تخصيص خيارات الصنف",
                 label_side_option: "اختر الصنف الجانبي *",
@@ -1299,6 +1333,7 @@ function calculateCartTotals() {
         let addressData = [];
         let cart = [];
         let currentDeliveryFee = 0;
+let appliedCoupon = null;
         let activeCategory = 'all';
         let activeTrackingOrderId = null;
         let statusPollInterval = null;
@@ -1870,6 +1905,15 @@ function updateCartUI() {
     
     // Display or hide discount row based on eligibility
     const discountRow = document.getElementById('summary-discount-row');
+    const couponRow = document.getElementById('summary-coupon-row');
+    if (couponRow) {
+        if (totals.couponDiscount > 0) {
+            couponRow.style.display = 'flex';
+            document.getElementById('summary-coupon-discount').innerText = `-${totals.couponDiscount.toFixed(2)} EGP`;
+        } else {
+            couponRow.style.display = 'none';
+        }
+    }
     if (totals.discountAmount > 0) {
         discountRow.style.display = 'flex';
         document.getElementById('summary-discount').innerText = `-${totals.discountAmount.toFixed(2)} EGP (${(totals.discountRate * 100)}% OFF lowest)`;
@@ -1912,6 +1956,41 @@ function updateCartUI() {
             </div>
         </div>
     `).join('');
+}
+
+async function applyCoupon() {
+    const input = document.getElementById('coupon-code');
+    const message = document.getElementById('coupon-message');
+    const code = input.value.trim().toUpperCase();
+    const t = translations[currentLang];
+
+    appliedCoupon = null;
+    message.style.display = 'none';
+    updateCartUI();
+
+    if (!code) return;
+
+    try {
+        const res = await fetch(CONFIG.API_URL + '?action=getCoupon&code=' + encodeURIComponent(code));
+        const data = await res.json();
+
+        if (data && data.valid) {
+            appliedCoupon = { code: data.code, type: data.type, amount: parseFloat(data.amount) || 0 };
+            message.textContent = `${t.coupon_applied}: ${appliedCoupon.code}`;
+            message.style.color = 'var(--success-green)';
+            message.style.display = 'block';
+            updateCartUI();
+        } else {
+            message.textContent = t.coupon_invalid;
+            message.style.color = 'var(--primary-red)';
+            message.style.display = 'block';
+        }
+    } catch (err) {
+        console.error('Coupon validation error', err);
+        message.textContent = t.coupon_invalid;
+        message.style.color = 'var(--primary-red)';
+        message.style.display = 'block';
+    }
 }
 
         function openCartDrawer() { document.getElementById('cart-modal').style.display = 'flex'; }
@@ -1973,6 +2052,8 @@ const totals = calculateCartTotals();
         Items: formattedItemsString,
         total: document.getElementById('summary-total').innerText,
         Total: document.getElementById('summary-total').innerText.replace(" EGP", ""),
+        couponCode: appliedCoupon ? appliedCoupon.code : "",
+        CouponCode: appliedCoupon ? appliedCoupon.code : "",
         status: 'Idle',
         Status: 'Idle',
         timestamp: new Date().toISOString(),
