@@ -1510,7 +1510,9 @@ async function loadMenu(isBackground = false) {
             fetchedItems = data;
             localStorage.setItem('fast_travel_menu', JSON.stringify(fetchedItems));
         }
-    } catch (err) {}
+} catch (err) {
+    console.error("Failed to fetch menu:", err);
+}
 
     if (fetchedItems.length > 0) {
         menuItems = fetchedItems;
@@ -2062,7 +2064,9 @@ const totals = calculateCartTotals();
         const orders = raw ? JSON.parse(raw) : [];
         orders.push(orderPayload);
         localStorage.setItem('fast_travel_orders', JSON.stringify(orders));
-    } catch (err) {}
+} catch (err) {
+    console.error("Failed to fetch menu:", err);
+}
 
     try {
         await fetch(CONFIG.API_URL, {
