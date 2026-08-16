@@ -752,6 +752,164 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
   .sidebar-panel{border-radius:16px!important;padding:15px!important}
 }
 
+/* Current Offers - horizontal local-image scrolling ad */
+.offers-ad {
+    position: relative;
+    width: 100%;
+    height: 150px;
+    overflow: hidden;
+    background: #050505;
+    border-top: 1px solid rgba(230, 25, 25, 0.45);
+    border-bottom: 1px solid rgba(230, 25, 25, 0.55);
+    box-shadow: 0 0 22px rgba(230, 25, 25, 0.16);
+    z-index: 40;
+}
+
+.offers-ad-track {
+    display: flex;
+    align-items: stretch;
+    width: max-content;
+    height: 100%;
+    animation: offersHorizontalMove 32s linear infinite;
+    will-change: transform;
+}
+
+.offer-slide {
+    position: relative;
+    flex: 0 0 min(520px, 86vw);
+    width: min(520px, 86vw);
+    height: 100%;
+    overflow: hidden;
+    margin-right: 10px;
+    background: #101010;
+    border-left: 1px solid rgba(255,255,255,.08);
+    border-right: 1px solid rgba(255,255,255,.08);
+}
+
+.offer-slide::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0,0,0,.78), rgba(0,0,0,.25) 48%, rgba(0,0,0,.62));
+    pointer-events: none;
+}
+
+.offer-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.offer-content {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 18px 24px;
+    text-align: left;
+}
+
+.offer-title {
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(.78rem, 1.5vw, 1rem);
+    font-weight: 900;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    text-shadow: 0 0 14px rgba(230,25,25,.65);
+}
+
+.offer-description {
+    margin-top: 5px;
+    color: #eee;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(.78rem, 1.5vw, .95rem);
+    font-weight: 700;
+    letter-spacing: .4px;
+}
+
+.offer-code {
+    display: none;
+    margin-top: 8px;
+    padding: 4px 10px;
+    border: 1px solid rgba(230,25,25,.7);
+    border-radius: 999px;
+    background: rgba(230,25,25,.16);
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: .68rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+@keyframes offersHorizontalMove {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+body.lang-ar .offer-content {
+    align-items: flex-end;
+    text-align: right;
+}
+
+body.lang-ar .offer-title,
+body.lang-ar .offer-code {
+    font-family: 'Cairo', sans-serif;
+    letter-spacing: 0;
+    text-transform: none;
+}
+
+body.lang-ar .offer-description {
+    font-family: 'Cairo', sans-serif;
+}
+
+.offers-ad:hover .offers-ad-track {
+    animation-play-state: paused;
+}
+
+@media (max-width: 600px) {
+    .offers-ad {
+        height: 112px;
+    }
+
+    .offer-slide {
+        flex-basis: 88vw;
+        width: 88vw;
+        margin-right: 7px;
+    }
+
+    .offer-content {
+        padding: 13px 16px;
+    }
+
+    .offer-title {
+        font-size: .68rem;
+    }
+
+    .offer-description {
+        font-size: .72rem;
+    }
+
+    .offer-code {
+        font-size: .58rem;
+        padding: 3px 8px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .offers-ad-track {
+        animation: none;
+    }
+}
+
+
+
 </style>
 </head>
 <body class="lang-en">
@@ -776,6 +934,11 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
             </button>
         </div>
     </header>
+
+    <!-- Current Offers Ad -->
+    <div class="offers-ad" id="offers-ad" aria-label="Current Offers">
+        <div class="offers-ad-track" id="offers-ad-track"></div>
+    </div>
 
     <!-- Main Content Grid -->
     <div class="container">
@@ -851,8 +1014,8 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
                     <div class="form-group">
                         <label data-i18n="label_payment">Payment Selection *</label>
                         <select id="cust-payment" class="form-control">
-                            <option value="CASH" data-i18n="pay_cod">CASH 💵</option>
-                            <option value="CARD" data-i18n="pay_card">CARD 💳</option>
+                            <option value="Cash on Delivery" data-i18n="pay_cod">Cash on Delivery 💵</option>
+                            <option value="Card on Delivery (POS)" data-i18n="pay_card">Card on Delivery (POS Machine) 💳</option>
                         </select>
                     </div>
 
@@ -1189,8 +1352,8 @@ function calculateCartTotals() {
                 label_address: "Address details *",
                 placeholder_address: "Street name, building number, floor...",
                 label_payment: "Payment Selection *",
-                pay_cod: "CASH 💵",
-                pay_card: "CARD 💳",
+                pay_cod: "Cash on Delivery 💵",
+                pay_card: "Card on Delivery (POS Machine) 💳",
 		label_notes: "Notes on Order",
 		placeholder_notes: "Special instructions, extra sauce, delivery notes...",
                 subtotal: "Subtotal",
@@ -1305,7 +1468,60 @@ function calculateCartTotals() {
 
         let currentLang = 'en';
 
-        function toggleLanguage() {
+        
+
+let localOffers = [];
+
+function renderLocalOffers() {
+    const track = document.getElementById('offers-ad-track');
+    if (!track || !localOffers.length) return;
+
+    const isArabic = document.body.classList.contains('lang-ar');
+    const slides = localOffers.map(offer => {
+        const title = isArabic ? (offer.titleAr || offer.title || '') : (offer.title || '');
+        const description = isArabic ? (offer.descriptionAr || offer.description || '') : (offer.description || '');
+        const code = offer.code || '';
+        const image = String(offer.image || '').trim();
+        const safeImage = sanitizeHTML(image);
+
+        return `
+            <div class="offer-slide">
+                <img class="offer-image"
+                     src="${safeImage}"
+                     alt="${sanitizeHTML(title)}"
+                     loading="eager"
+                     decoding="async"
+                     onerror="this.onerror=null; const p=this.getAttribute('src')||''; this.src=(p.startsWith('ads/') ? p.substring(4) : 'ads/'+p);">
+                <div class="offer-content">
+                    <div class="offer-title">${sanitizeHTML(title)}</div>
+                    <div class="offer-description">${sanitizeHTML(description)}</div>
+                    ${code ? `<div class="offer-code">CODE: ${sanitizeHTML(code)}</div>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    // Duplicate the same set once so the horizontal animation can loop seamlessly.
+    track.innerHTML = slides + slides;
+}
+
+async function loadLocalOffers() {
+    try {
+        const response = await fetch('ads/ads.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error('Unable to load local ads file');
+        const data = await response.json();
+        localOffers = Array.isArray(data) ? data : (data.offers || []);
+        renderLocalOffers();
+    } catch (err) {
+        console.error('Failed to load local offers:', err);
+    }
+}
+
+function updateOffersLanguage() {
+    renderLocalOffers();
+}
+
+function toggleLanguage() {
             currentLang = currentLang === 'en' ? 'ar' : 'en';
             const htmlRoot = document.getElementById('html-root');
             const body = document.body;
@@ -2194,7 +2410,19 @@ const totals = calculateCartTotals();
             activeTrackingOrderId = null;
             if (statusPollInterval) clearInterval(statusPollInterval);
         }
-    </script>
+    document.addEventListener('DOMContentLoaded', () => {
+        loadLocalOffers();
+        updateOffersLanguage();
+    });
+</script>
 <script src="visual-effects.js" defer></script>
+
+<script>
+(function () {
+    const observer = new MutationObserver(updateOffersLanguage);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+})();
+</script>
+
 </body>
 </html>
