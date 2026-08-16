@@ -685,7 +685,10 @@ label{color:#bbb!important;font-size:.76rem!important;letter-spacing:.3px}
 }
 /* Cinematic reveal classes added by visual-effects.js */
 .ft-reveal{opacity:0;transform:translateY(38px) scale(.985);filter:blur(4px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1),filter .8s ease;transition-delay:var(--ft-delay,0ms)}
+/* Stable cinematic reveal: once visible, content stays visible when scrolling back. */
 .ft-reveal.is-visible{opacity:1;transform:none;filter:none}
+/* Do not let dynamic menu rendering create an invisible frame during startup. */
+.ft-reveal.card{will-change:opacity,transform,filter;}
 /* Keep initial loading/menu content visible if JS is blocked */
 html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.ft-reveal{opacity:1!important;transform:none!important;filter:none!important;transition:none!important}*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
