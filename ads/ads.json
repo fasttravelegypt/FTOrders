@@ -1,26 +1,11 @@
 [
   {
     "image": "ads/offer-1.jpg",
-    "title": "EXCLUSIVE ONLINE OFFER",
-    "titleAr": "عرض حصري أونلاين",
-    "description": "Extra exclusive to site users — 5% OFF",
-    "descriptionAr": "خصم حصري لمستخدمي الموقع — خصم 5%",
-    "code": "FT05"
   },
   {
     "image": "ads/offer-2.jpg",
-    "title": "BUY MORE MEALS, GET MORE",
-    "titleAr": "اطلب وجبات أكثر واحصل على المزيد",
-    "description": "Get up to 100% FREE on your meal",
-    "descriptionAr": "احصل على وجبتك مجاناً بنسبة تصل إلى 100%",
-    "code": ""
   },
   {
     "image": "ads/offer-3.jpg",
-    "title": "DELIVERY SPECIAL",
-    "titleAr": "عرض التوصيل",
-    "description": "Enjoy 10 EGP delivery fees",
-    "descriptionAr": "استمتع برسوم توصيل 10 جنيه فقط",
-    "code": ""
   }
 ]
