@@ -770,7 +770,7 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
     align-items: stretch;
     width: max-content;
     height: 100%;
-    animation: offersHorizontalMove 32s linear infinite;
+    animation: offersSlideShift 18s cubic-bezier(.4,0,.2,1) infinite;
     will-change: transform;
 }
 
@@ -848,9 +848,20 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
     letter-spacing: 1px;
 }
 
-@keyframes offersHorizontalMove {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
+/* Slide-by-slide movement: each offer stays visible, then shifts smoothly to the next */
+@keyframes offersSlideShift {
+    0%, 27% {
+        transform: translateX(0);
+    }
+    33.333%, 60.333% {
+        transform: translateX(-16.6667%);
+    }
+    66.666%, 93.666% {
+        transform: translateX(-33.3333%);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
 }
 
 body.lang-ar .offer-content {
@@ -871,6 +882,14 @@ body.lang-ar .offer-description {
 
 .offers-ad:hover .offers-ad-track {
     animation-play-state: paused;
+}
+
+/* Slight visual depth during each slide transition */
+.offer-slide {
+    transition: filter .45s ease, opacity .45s ease;
+}
+.offers-ad-track {
+    perspective: 900px;
 }
 
 @media (max-width: 600px) {
