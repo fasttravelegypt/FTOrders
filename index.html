@@ -1239,8 +1239,8 @@ body.lang-ar .offer-description {
                     <label data-i18n="label_side_option">Select Base Option *</label>
                     <select id="meal-side-choice-1" class="form-control">
                         <option value="Rice" data-i18n="side_rice">Rice </option>
-                        <option value="Pasta" data-i18n="side_pasta">Pasta </option>
-                        <option value="Fries" selected data-i18n="side_fries">Fries </option>
+                        <option value="Pasta" selected data-i18n="side_pasta">Pasta </option>
+                        <option value="Fries" data-i18n="side_fries">Fries </option>
                         <option value="Sandwich" data-i18n="side_sandwich">Sandwich </option>
                     </select>
                 </div>
@@ -2427,12 +2427,12 @@ return `
                 isMightyTender = true;
             }
 
-            const sideOptionsHTML = `
-                <option value="Rice">Rice </option>
-                <option value="Pasta">Pasta </option>
-                <option value="Fries" selected>Fries </option>
-                <option value="Sandwich">Sandwich </option>
-            `;
+const sideOptionsHTML = `
+    <option value="Rice">Rice </option>
+    <option value="Pasta" selected>Pasta </option>
+    <option value="Fries">Fries </option>
+    <option value="Sandwich">Sandwich </option>
+`;
 
             const flavorOptionsHTML = `
                 <option value="كلاسيك">كلاسيك</option>
