@@ -1972,6 +1972,20 @@ window.addEventListener('DOMContentLoaded', () => {
     onOrderTypeChange();
 });
 
+window.addEventListener('DOMContentLoaded', () => {
+    const pendingPaymentOrder = sessionStorage.getItem('fast_travel_pending_payment_order');
+    if (pendingPaymentOrder) {
+        sessionStorage.removeItem('fast_travel_pending_payment_order');
+        activeTrackingOrderId = pendingPaymentOrder;
+        document.getElementById('modal-order-id').innerText = pendingPaymentOrder;
+        document.getElementById('modal-order-status').innerText = currentLang === 'ar' ? 'جاري التحقق من الدفع...' : 'Checking payment...';
+        document.getElementById('success-modal').style.display = 'flex';
+        if (statusPollInterval) clearInterval(statusPollInterval);
+        pollOrderStatus();
+        statusPollInterval = setInterval(pollOrderStatus, 3000);
+    }
+});
+
         function sanitizeHTML(str) {
             return String(str)
                 .replace(/&/g, '&amp;')
@@ -2823,12 +2837,59 @@ const totals = calculateCartTotals();
     } catch (err) {}
 
     try {
-        await fetch(CONFIG.API_URL, {
+        const isOnlinePayment = orderPayload.payment === "Online Payment Debit/Credit";
+        const apiPayload = isOnlinePayment
+            ? {
+                action: "createPaymobPayment",
+                order: orderPayload,
+                returnUrl: window.location.href.split('#')[0].split('?')[0]
+              }
+            : { action: "placeOrder", order: orderPayload };
+
+        const response = await fetch(CONFIG.API_URL, {
             method: "POST",
-            body: JSON.stringify({ action: "placeOrder", order: orderPayload })
+            body: JSON.stringify(apiPayload)
         });
+
+        const result = await response.json();
+
+        if (!result || result.status !== "success") {
+            throw new Error((result && result.message) || "Order submission failed.");
+        }
+
+        // Keep the server-generated order ID so payment tracking always uses the real ID.
+        orderPayload.orderId = result.orderId || orderPayload.orderId;
+        orderPayload.OrderID = orderPayload.orderId;
+        orderPayload.status = result.paymentStatus === "Pending" ? "Payment Pending" : (result.status || "Idle");
+        orderPayload.Status = orderPayload.status;
+        orderPayload.paymentStatus = result.paymentStatus || "Not Required";
+        orderPayload.PaymentStatus = orderPayload.paymentStatus;
+
+        try {
+            const raw = localStorage.getItem('fast_travel_orders');
+            const orders = raw ? JSON.parse(raw) : [];
+            const existingIndex = orders.findIndex(o => o.orderId === orderPayload.orderId || o.OrderID === orderPayload.orderId);
+            if (existingIndex >= 0) orders[existingIndex] = { ...orders[existingIndex], ...orderPayload };
+            else orders.push(orderPayload);
+            localStorage.setItem('fast_travel_orders', JSON.stringify(orders));
+        } catch (err) {}
+
+        if (isOnlinePayment) {
+            if (!result.checkoutUrl) {
+                throw new Error("Paymob checkout URL was not returned.");
+            }
+
+            // Keep the order ID available after Paymob redirects back to the page.
+            sessionStorage.setItem('fast_travel_pending_payment_order', orderPayload.orderId);
+            window.location.href = result.checkoutUrl;
+            return;
+        }
     } catch (err) {
         console.error("API network error during order dispatch", err);
+        alert(currentLang === 'ar' ? `تعذر إرسال الطلب: ${err.message || 'خطأ غير معروف'}` : `Unable to submit the order: ${err.message || 'Unknown error'}`);
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+        return;
     }
 
     // Restore button state after completion
@@ -2843,15 +2904,35 @@ const totals = calculateCartTotals();
     statusPollInterval = setInterval(pollOrderStatus, 3000);
 }
 
-        function pollOrderStatus() {
+        async function pollOrderStatus() {
             if (!activeTrackingOrderId) return;
-            const raw = localStorage.getItem('fast_travel_orders');
-            if (!raw) return;
-            const orders = JSON.parse(raw);
-            const found = orders.find(o => o.orderId === activeTrackingOrderId || o.OrderID === activeTrackingOrderId);
-            if (found) {
-                const status = found.status || found.Status;
-                document.getElementById('modal-order-status').innerText = status;
+
+            try {
+                const response = await fetch(CONFIG.API_URL + '?action=getOrderStatus&orderId=' + encodeURIComponent(activeTrackingOrderId), { cache: 'no-store' });
+                const result = await response.json();
+
+                if (result && result.status === 'success' && result.order) {
+                    const order = result.order;
+                    const paymentStatus = order.PaymentStatus || order.paymentStatus || '';
+                    const status = order.Status || order.status || 'Idle';
+                    const displayStatus = paymentStatus && paymentStatus !== 'Not Required'
+                        ? `${status} / ${paymentStatus}`
+                        : status;
+
+                    document.getElementById('modal-order-status').innerText = displayStatus;
+
+                    try {
+                        const raw = localStorage.getItem('fast_travel_orders');
+                        const orders = raw ? JSON.parse(raw) : [];
+                        const index = orders.findIndex(o => o.orderId === activeTrackingOrderId || o.OrderID === activeTrackingOrderId);
+                        if (index >= 0) {
+                            orders[index] = { ...orders[index], ...order };
+                            localStorage.setItem('fast_travel_orders', JSON.stringify(orders));
+                        }
+                    } catch (err) {}
+                }
+            } catch (err) {
+                console.error('Order status polling failed:', err);
             }
         }
 
