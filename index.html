@@ -1096,6 +1096,43 @@ body.lang-ar .offer-description {
         </aside>
     </div>
 
+	<!-- Menu Image Preview Modal -->
+<div id="menu-image-modal"
+     class="modal-overlay"
+     onclick="if(event.target === this) closeMenuImageModal()">
+
+    <div class="menu-image-modal-content">
+
+        <button
+            class="close-modal"
+            onclick="closeMenuImageModal()"
+            aria-label="Close">
+            &times;
+        </button>
+
+        <img
+            id="menu-image-preview"
+            class="menu-image-preview"
+            src=""
+            alt="">
+
+        <div class="menu-image-preview-info">
+
+            <h3
+                id="menu-image-preview-title"
+                class="menu-image-preview-title">
+            </h3>
+
+            <p
+                id="menu-image-preview-description"
+                class="menu-image-preview-description">
+            </p>
+
+        </div>
+
+    </div>
+</div>
+	
     <!-- Side Selection Modal -->
     <div id="side-modal" class="modal-overlay" onclick="if(event.target === this) closeSideModal()">
         <div class="modal-content">
@@ -2088,7 +2125,16 @@ function renderMenu(category) {
 return `
     <div class="${cardClass}">
         <div class="card-img-wrapper">
-            <img src="${sanitizeHTML(imageName)}" alt="${sanitizeHTML(item.name || '')}" loading="lazy" decoding="async" width="400" height="300" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'">
+            <img
+    src="${sanitizeHTML(imageName)}"
+    alt="${sanitizeHTML(itemName)}"
+    class="menu-image-clickable"
+    loading="lazy"
+    decoding="async"
+    width="400"
+    height="300"
+    onclick="openMenuImageModal(event, '${sanitizeHTML(imageName)}', '${sanitizeHTML(itemName)}', '${sanitizeHTML(itemDescription)}')"
+    onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'">
             ${badgeHTML}
             <div class="price-tag">${item.price || '0'} EGP</div>
         </div>
@@ -2435,6 +2481,43 @@ return `
             updateCartUI();
         }
 
+		function openMenuImageModal(event, image, title, description) {
+    if (event) {
+        event.stopPropagation();
+    }
+
+    const modal = document.getElementById('menu-image-modal');
+    const previewImage = document.getElementById('menu-image-preview');
+    const previewTitle = document.getElementById('menu-image-preview-title');
+    const previewDescription = document.getElementById('menu-image-preview-description');
+
+    if (!modal || !previewImage || !previewTitle || !previewDescription) {
+        return;
+    }
+
+    previewImage.src = image;
+    previewImage.alt = title;
+
+    previewTitle.innerText = title;
+    previewDescription.innerText = description;
+
+    modal.style.display = 'flex';
+
+    document.body.style.overflow = 'hidden';
+}
+
+function closeMenuImageModal() {
+    const modal = document.getElementById('menu-image-modal');
+
+    if (!modal) {
+        return;
+    }
+
+    modal.style.display = 'none';
+
+    document.body.style.overflow = '';
+}
+
 function updateCartUI() {
     const totalCount = cart.reduce((sum, item) => sum + item.qty, 0);
     document.getElementById('cart-badge').innerText = totalCount;
@@ -2672,6 +2755,11 @@ const totals = calculateCartTotals();
         loadLocalOffers();
         updateOffersLanguage();
     });
+		document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeMenuImageModal();
+    }
+});
 </script>
 <script src="visual-effects.js" defer></script>
 
