@@ -1134,10 +1134,11 @@ body.lang-ar .offer-description {
 
                     <div class="form-group">
                         <label data-i18n="label_payment">Payment Selection *</label>
-                        <select id="cust-payment" class="form-control">
-                            <option value="Cash on Delivery" data-i18n="pay_cod">Cash on Delivery 💵</option>
-                            <option value="Card on Delivery (POS)" data-i18n="pay_card">Card on Delivery (POS Machine) 💳</option>
-                        </select>
+<select id="cust-payment" class="form-control">
+    <option value="Cash on Delivery" data-i18n="pay_cod">Cash on Delivery 💵</option>
+    <option value="Card on Delivery (POS)" data-i18n="pay_card">Card on Delivery (POS Machine) 💳</option>
+    <option value="Online Payment Debit/Credit" data-i18n="pay_online">Online Payment Debit/Credit 💳</option>
+</select>
                     </div>
 
 <div class="form-group">
@@ -1512,6 +1513,8 @@ function calculateCartTotals() {
                 label_payment: "Payment Selection *",
                 pay_cod: "Cash on Delivery 💵",
                 pay_card: "Card on Delivery (POS Machine) 💳",
+				pay_online: "Online Payment Debit/Credit 💳",
+				pay_store: "Pay at Store 🏪",
 		label_notes: "Notes on Order",
 		placeholder_notes: "Special instructions, extra sauce, delivery notes...",
                 subtotal: "Subtotal",
@@ -1582,6 +1585,8 @@ function calculateCartTotals() {
                 label_payment: "طريقة الدفع *",
                 pay_cod: "الدفع عند الاستلام كاش 💵",
                 pay_card: "الدفع بالبطاقة عند الاستلام (ماكينة POS) 💳",
+				pay_online: "الدفع أونلاين بالبطاقة 💳",
+				pay_store: "الدفع في المطعم 🏪",
                 subtotal: "المجموع الفرعي",
                 delivery_fee: "رسوم التوصيل",
                 total_amount: "المبلغ الإجمالي",
@@ -2030,6 +2035,27 @@ function populateCities() {
 
 function onOrderTypeChange() {
     const orderType = document.getElementById('order-type')?.value || 'Delivery';
+	const paymentSelect = document.getElementById('cust-payment');
+
+if (paymentSelect) {
+    if (orderType === 'Store Pickup') {
+        paymentSelect.innerHTML = `
+            <option value="Pay at Store" data-i18n="pay_store">Pay at Store 🏪</option>
+            <option value="Online Payment Debit/Credit" data-i18n="pay_online">Online Payment Debit/Credit 💳</option>
+        `;
+    } else {
+        paymentSelect.innerHTML = `
+            <option value="Cash on Delivery" data-i18n="pay_cod">Cash on Delivery 💵</option>
+            <option value="Card on Delivery (POS)" data-i18n="pay_card">Card on Delivery (POS Machine) 💳</option>
+            <option value="Online Payment Debit/Credit" data-i18n="pay_online">Online Payment Debit/Credit 💳</option>
+        `;
+    }
+
+    // Re-apply current language to the newly created options
+    if (typeof applyTranslations === 'function') {
+        applyTranslations();
+    }
+}
 
     const cityGroup = document.getElementById('cust-city')?.closest('.form-group');
     const areaGroup = document.getElementById('cust-area')?.closest('.form-group');
