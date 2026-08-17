@@ -540,6 +540,232 @@
 
         .close-modal:hover { color: #fff; box-shadow: none; filter: none; }
 
+		/* =========================================
+   MENU IMAGE PREVIEW MODAL
+   Responsive - Desktop + Mobile
+   ========================================= */
+
+.menu-image-modal-content {
+    width: min(90vw, 650px);
+    max-height: 88vh;
+
+    padding: 14px;
+
+    background: #0b0b0b;
+    border: 1px solid rgba(255, 30, 60, 0.45);
+    border-radius: 18px;
+
+    box-shadow:
+        0 20px 70px rgba(0, 0, 0, 0.9),
+        0 0 35px rgba(255, 30, 60, 0.25);
+
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+}
+
+
+/* =========================================
+   IMAGE
+   ========================================= */
+
+.menu-image-preview {
+    width: 100%;
+
+    /*
+       The image will never consume the whole popup.
+       This leaves room for the title + description.
+    */
+    height: min(50vh, 400px);
+
+    object-fit: contain;
+
+    display: block;
+
+    border-radius: 12px;
+
+    background: #050505;
+
+    flex-shrink: 1;
+}
+
+
+/* =========================================
+   INFORMATION BELOW IMAGE
+   ========================================= */
+
+.menu-image-preview-info {
+    padding: 14px 5px 4px;
+
+    flex-shrink: 0;
+
+    overflow-y: auto;
+
+    max-height: 30vh;
+
+    text-align: left;
+}
+
+body.lang-ar .menu-image-preview-info {
+    text-align: right;
+}
+
+
+/* ITEM NAME */
+
+.menu-image-preview-title {
+    font-family: 'Orbitron', sans-serif;
+
+    font-size: 1.3rem;
+
+    font-weight: 900;
+
+    line-height: 1.25;
+
+    color: #fff;
+
+    margin-bottom: 7px;
+
+    text-shadow:
+        0 0 10px rgba(255, 30, 60, 0.35);
+}
+
+body.lang-ar .menu-image-preview-title {
+    font-family: 'Cairo', sans-serif;
+}
+
+
+/* DESCRIPTION */
+
+.menu-image-preview-description {
+    color: var(--text-muted);
+
+    font-size: 0.95rem;
+
+    line-height: 1.55;
+
+    margin: 0;
+}
+
+body.lang-ar .menu-image-preview-description {
+    font-family: 'Cairo', sans-serif;
+}
+
+
+/* =========================================
+   IMAGE CLICK
+   ========================================= */
+
+.menu-image-clickable {
+    cursor: zoom-in;
+}
+
+.menu-image-clickable:hover {
+    filter: brightness(1.08);
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 600px) {
+
+    .menu-image-modal-content {
+        width: 92vw;
+
+        max-width: 92vw;
+
+        max-height: 86vh;
+
+        padding: 10px;
+
+        border-radius: 15px;
+    }
+
+
+    .menu-image-preview {
+
+        /*
+           Smaller on mobile so description
+           always remains visible.
+        */
+        height: min(42vh, 300px);
+
+        max-height: 300px;
+
+        border-radius: 10px;
+    }
+
+
+    .menu-image-preview-info {
+        padding: 11px 4px 3px;
+
+        max-height: 32vh;
+
+        overflow-y: auto;
+    }
+
+
+    .menu-image-preview-title {
+        font-size: 1.05rem;
+
+        margin-bottom: 6px;
+    }
+
+
+    .menu-image-preview-description {
+        font-size: 0.82rem;
+
+        line-height: 1.5;
+    }
+}
+
+
+/* =========================================
+   VERY SMALL PHONES
+   ========================================= */
+
+@media (max-width: 380px) {
+
+    .menu-image-modal-content {
+        width: 94vw;
+
+        max-height: 84vh;
+
+        padding: 8px;
+    }
+
+
+    .menu-image-preview {
+        height: 36vh;
+
+        max-height: 240px;
+    }
+
+
+    .menu-image-preview-info {
+        max-height: 35vh;
+
+        padding-top: 9px;
+    }
+
+
+    .menu-image-preview-title {
+        font-size: 0.95rem;
+    }
+
+
+    .menu-image-preview-description {
+        font-size: 0.78rem;
+
+        line-height: 1.45;
+    }
+}
+		
         .cart-item-row {
             display: flex;
             justify-content: space-between;
