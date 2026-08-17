@@ -2224,7 +2224,7 @@ return `
     decoding="async"
     width="400"
     height="300"
-    onclick="openMenuImageModal(event, '${sanitizeHTML(imageName)}', '${sanitizeHTML(itemName)}', '${sanitizeHTML(itemDescription)}')"
+    onclick="openMenuImageModal(event, ${JSON.stringify(imageName)}, ${JSON.stringify(itemName)}, ${JSON.stringify(itemDescription)})"
     onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'">
             ${badgeHTML}
             <div class="price-tag">${item.price || '0'} EGP</div>
