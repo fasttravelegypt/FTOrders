@@ -775,8 +775,16 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
     transition: transform .75s cubic-bezier(.65,0,.25,1);
     will-change: transform;
 	direction: ltr;
+	cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-y;
 }
 		
+.offers-ad-track.dragging {
+    cursor: grabbing;
+    transition: none !important;
+}		
 
 .offer-slide {
     flex: 0 0 100%;
@@ -790,6 +798,8 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
     margin: 0;
     background: #101010;
 	direction: ltr;
+	user-select: none;
+    -webkit-user-select: none;
 }
 
 .offer-slide::after {
@@ -808,6 +818,9 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
     object-fit: cover;
     object-position: center;
     display: block;
+	pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
 }
 
 .offer-content {
@@ -1492,6 +1505,10 @@ let localOffers = [];
 let localOfferIndex = 0;
 let localOfferTimer = null;
 let localOfferResizeTimer = null;
+let localOfferDragging = false;
+let localOfferStartX = 0;
+let localOfferCurrentX = 0;
+let localOfferDragOffset = 0;
 
 function setOffersAdHeight(index) {
     const ad = document.getElementById('offers-ad');
@@ -1535,6 +1552,158 @@ function showLocalOffer(index, animate = true) {
     track.style.transform = `translateX(-${localOfferIndex * 100}%)`;
 
     setOffersAdHeight(localOfferIndex);
+}
+
+		function setupLocalOfferSwipe() {
+    const track = document.getElementById('offers-ad-track');
+    if (!track) return;
+
+    let startX = 0;
+    let startY = 0;
+    let isDragging = false;
+    let hasMoved = false;
+
+    function getClientX(event) {
+        if (event.touches && event.touches.length) {
+            return event.touches[0].clientX;
+        }
+
+        if (event.changedTouches && event.changedTouches.length) {
+            return event.changedTouches[0].clientX;
+        }
+
+        return event.clientX;
+    }
+
+    function startDrag(event) {
+        if (!localOffers.length || localOffers.length <= 1) return;
+
+        startX = getClientX(event);
+        startY = event.touches && event.touches.length
+            ? event.touches[0].clientY
+            : event.clientY;
+
+        isDragging = true;
+        hasMoved = false;
+
+        localOfferDragging = true;
+
+        track.classList.add('dragging');
+
+        if (localOfferTimer) {
+            clearInterval(localOfferTimer);
+        }
+    }
+
+    function moveDrag(event) {
+        if (!isDragging) return;
+
+        const currentX = getClientX(event);
+
+        const currentY = event.touches && event.touches.length
+            ? event.touches[0].clientY
+            : event.clientY;
+
+        const deltaX = currentX - startX;
+        const deltaY = currentY - startY;
+
+        // Ignore mostly vertical movement
+        if (!hasMoved) {
+            if (Math.abs(deltaY) > Math.abs(deltaX)) {
+                isDragging = false;
+                track.classList.remove('dragging');
+                startLocalOfferSlider();
+                return;
+            }
+
+            if (Math.abs(deltaX) > 5) {
+                hasMoved = true;
+            }
+        }
+
+        if (!hasMoved) return;
+
+        if (event.cancelable) {
+            event.preventDefault();
+        }
+
+        localOfferCurrentX = deltaX;
+
+        const width = track.parentElement
+            ? track.parentElement.clientWidth
+            : 0;
+
+        if (!width) return;
+
+        const percentageOffset = (deltaX / width) * 100;
+
+        track.style.transition = 'none';
+
+        track.style.transform =
+            `translateX(calc(-${localOfferIndex * 100}% + ${percentageOffset}%))`;
+    }
+
+    function endDrag() {
+        if (!isDragging) return;
+
+        isDragging = false;
+        track.classList.remove('dragging');
+
+        const width = track.parentElement
+            ? track.parentElement.clientWidth
+            : 0;
+
+        if (!width) {
+            startLocalOfferSlider();
+            return;
+        }
+
+        const threshold = Math.min(100, width * 0.20);
+
+        if (Math.abs(localOfferCurrentX) >= threshold) {
+
+            if (localOfferCurrentX < 0) {
+                // Swipe left → next slide
+                showLocalOffer(localOfferIndex + 1, true);
+            } else {
+                // Swipe right → previous slide
+                showLocalOffer(localOfferIndex - 1, true);
+            }
+
+        } else {
+            // Not enough movement → return to current slide
+            showLocalOffer(localOfferIndex, true);
+        }
+
+        localOfferCurrentX = 0;
+        localOfferDragging = false;
+
+        startLocalOfferSlider();
+    }
+
+    // Mouse
+    track.addEventListener('mousedown', startDrag);
+
+    window.addEventListener('mousemove', moveDrag);
+
+    window.addEventListener('mouseup', endDrag);
+
+    // Touch
+    track.addEventListener('touchstart', startDrag, {
+        passive: true
+    });
+
+    track.addEventListener('touchmove', moveDrag, {
+        passive: false
+    });
+
+    track.addEventListener('touchend', endDrag, {
+        passive: true
+    });
+
+    track.addEventListener('touchcancel', endDrag, {
+        passive: true
+    });
 }
 
 function startLocalOfferSlider() {
@@ -1598,6 +1767,7 @@ async function loadLocalOffers() {
         const data = await response.json();
         localOffers = Array.isArray(data) ? data : (data.offers || []);
         renderLocalOffers();
+		setupLocalOfferSwipe();
     } catch (err) {
         console.error('Failed to load local offers:', err);
     }
