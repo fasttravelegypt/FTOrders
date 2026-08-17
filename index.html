@@ -774,7 +774,9 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
     transform: translateX(0);
     transition: transform .75s cubic-bezier(.65,0,.25,1);
     will-change: transform;
+	direction: ltr;
 }
+		
 
 .offer-slide {
     flex: 0 0 100%;
@@ -787,6 +789,7 @@ html.no-js .ft-reveal{opacity:1;transform:none;filter:none}
     overflow: hidden;
     margin: 0;
     background: #101010;
+	direction: ltr;
 }
 
 .offer-slide::after {
@@ -1620,6 +1623,8 @@ function toggleLanguage() {
             }
 
             applyTranslations();
+		    // FIX: Refresh offers after language change
+		    updateOffersLanguage();
             populateCities();
             renderMenu(activeCategory);
             updateCartUI();
