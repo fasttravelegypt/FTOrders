@@ -1038,42 +1038,6 @@ body.lang-ar .offer-description {
 
 
 
-
-        /* Hero's Meals - Tender Slayer - Ramen Shop Combo Offer Modal */
-        #meal-combo-offer-modal .meal-combo-offer-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 900;
-            color: #fff;
-            margin-bottom: 6px;
-            text-shadow: 0 0 12px rgba(230,25,25,.35);
-        }
-        #meal-combo-offer-modal .meal-combo-offer-subtitle {
-            color: #aaa;
-            font-size: .82rem;
-            margin-bottom: 16px;
-        }
-        .meal-combo-offer-options { display:flex; flex-direction:column; gap:9px; }
-        .meal-combo-offer-option { position:relative; display:block; cursor:pointer; }
-        .meal-combo-offer-option input { position:absolute; opacity:0; pointer-events:none; }
-        .meal-combo-offer-option-content {
-            display:flex; align-items:center; justify-content:space-between; gap:12px;
-            padding:12px 14px; background:#0b0b0b;
-            border:1px solid rgba(255,255,255,.1); border-radius:12px; transition:.2s ease;
-        }
-        .meal-combo-offer-option input:checked + .meal-combo-offer-option-content {
-            border-color:rgba(230,25,25,.85); background:rgba(230,25,25,.12);
-            box-shadow:0 0 20px rgba(230,25,25,.14);
-        }
-        .meal-combo-offer-option-content strong { color:#fff; font-size:.9rem; }
-        .meal-combo-offer-option-content span { color:#bbb; font-size:.78rem; text-align:right; }
-        body.lang-ar .meal-combo-offer-option-content span { text-align:left; }
-        @media(max-width:600px) {
-            .meal-combo-offer-option-content { padding:11px 12px; }
-            .meal-combo-offer-option-content strong { font-size:.82rem; }
-            .meal-combo-offer-option-content span { font-size:.7rem; }
-        }
-
 </style>
 </head>
 <body class="lang-en">
@@ -1268,41 +1232,6 @@ body.lang-ar .offer-description {
     </div>
 </div>
 	
-    <!-- Hero's Meals - Tender Slayer - Ramen Shop Combo Offer Modal -->
-    <div id="meal-combo-offer-modal" class="modal-overlay" onclick="if(event.target === this) closeMealComboOfferModal()">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ff1e3c33; padding-bottom: 10px; margin-bottom: 14px;">
-                <h3 class="section-title" style="font-size: 1.05rem; margin:0;"><span>🍜</span><span>Make This Meal?</span></h3>
-                <button class="close-modal" onclick="closeMealComboOfferModal()">&times;</button>
-            </div>
-            <div class="meal-combo-offer-title">Choose Your Meal Upgrade</div>
-            <div id="meal-combo-offer-item-name" class="meal-combo-offer-subtitle"></div>
-            <div class="meal-combo-offer-options">
-                <label class="meal-combo-offer-option">
-                    <input type="radio" name="meal-combo-offer" value="combo">
-                    <span class="meal-combo-offer-option-content">
-                        <strong>COMBO</strong><span>Fries + Drink &nbsp; +55 EGP</span>
-                    </span>
-                </label>
-                <label class="meal-combo-offer-option">
-                    <input type="radio" name="meal-combo-offer" value="super-combo">
-                    <span class="meal-combo-offer-option-content">
-                        <strong>Super Combo</strong><span>Fries + Drink + Cookie &nbsp; +95 EGP</span>
-                    </span>
-                </label>
-                <label class="meal-combo-offer-option">
-                    <input type="radio" name="meal-combo-offer" value="none" checked>
-                    <span class="meal-combo-offer-option-content">
-                        <strong>No Thanks</strong><span>Continue with the meal normally</span>
-                    </span>
-                </label>
-            </div>
-            <button type="button" onclick="confirmMealComboOffer()" style="width:100%; margin-top:14px; padding:12px;">
-                Continue ➔
-            </button>
-        </div>
-    </div>
-
     <!-- Side Selection Modal -->
     <div id="side-modal" class="modal-overlay" onclick="if(event.target === this) closeSideModal()">
         <div class="modal-content">
@@ -2042,8 +1971,6 @@ let appliedCoupon = null;
         let statusPollInterval = null;
         let pendingMealItem = null;
         let pendingClickEvent = null;
-        let pendingMealOfferType = null;
-        let pendingMealOfferSelections = null;
 
 window.addEventListener('DOMContentLoaded', () => {
     loadMenu();
@@ -2413,63 +2340,6 @@ return `
             finalizeAddToCart(event, item, null, null, null, null, null, null, null, null);
         }
 
-        function closeMealComboOfferModal() {
-            document.getElementById('meal-combo-offer-modal').style.display = 'none';
-            pendingMealOfferType = null;
-            pendingMealOfferSelections = null;
-            pendingMealItem = null;
-            pendingClickEvent = null;
-        }
-
-        function openMealComboOffer() {
-            if (!pendingMealItem || !pendingClickEvent) return;
-
-            document.getElementById('meal-combo-offer-item-name').innerText = pendingMealItem.name;
-            document.querySelector('input[name="meal-combo-offer"][value="none"]').checked = true;
-            document.getElementById('meal-combo-offer-modal').style.display = 'flex';
-        }
-
-        function confirmMealComboOffer() {
-            if (!pendingMealItem || !pendingClickEvent || !pendingMealOfferSelections) {
-                closeMealComboOfferModal();
-                return;
-            }
-
-            const selected = document.querySelector('input[name="meal-combo-offer"]:checked');
-            const choice = selected ? selected.value : 'none';
-
-            document.getElementById('meal-combo-offer-modal').style.display = 'none';
-
-            if (choice === 'none') {
-                pendingMealOfferType = null;
-                finalizeAddToCart(
-                    pendingClickEvent,
-                    pendingMealItem,
-                    pendingMealOfferSelections.sides,
-                    pendingMealOfferSelections.flavors,
-                    pendingMealOfferSelections.ramenSoup,
-                    pendingMealOfferSelections.ramenTopping,
-                    pendingMealOfferSelections.specificOption,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                );
-                pendingMealItem = null;
-                pendingClickEvent = null;
-                pendingMealOfferSelections = null;
-                return;
-            }
-
-            pendingMealOfferType = choice;
-
-            document.getElementById('side-modal-item-name').innerText = `Customize: ${pendingMealItem.name}`;
-            buildCustomizationFields(String(pendingMealItem.name || '').trim(), String(pendingMealItem.category || '').toLowerCase());
-            document.getElementById('side-modal').style.display = 'flex';
-        }
-
         function buildCustomizationFields(itemName, category) {
             const sidesContainer = document.getElementById('sides-container');
             const flavorsContainer = document.getElementById('flavors-container');
@@ -2486,33 +2356,13 @@ return `
             let isCombo = itemName === 'كومبو';
             let isSuperCombo = itemName === 'سوبر كومبو';
 
-            if (isRamen && !pendingMealOfferType) {
+            if (isRamen) {
                 sidesContainer.style.display = 'none';
                 flavorsContainer.style.display = 'none';
                 specificContainer.style.display = 'none';
                 comboContainer.style.display = 'none';
                 superComboContainer.style.display = 'none';
                 ramenContainer.style.display = 'block';
-                return;
-            }
-
-            if (isRamen && pendingMealOfferType === 'combo') {
-                sidesContainer.style.display = 'none';
-                flavorsContainer.style.display = 'none';
-                specificContainer.style.display = 'none';
-                ramenContainer.style.display = 'none';
-                comboContainer.style.display = 'block';
-                superComboContainer.style.display = 'none';
-                return;
-            }
-
-            if (isRamen && pendingMealOfferType === 'super-combo') {
-                sidesContainer.style.display = 'none';
-                flavorsContainer.style.display = 'none';
-                specificContainer.style.display = 'none';
-                ramenContainer.style.display = 'none';
-                comboContainer.style.display = 'none';
-                superComboContainer.style.display = 'block';
                 return;
             }
 
@@ -2625,7 +2475,6 @@ return `
             const isSpecificItem = itemName === 'باكيت بطاطس' || itemName === 'طبق باستا' || itemName === 'طبق أرز' || itemName === 'صوص التندر';
             const isCombo = itemName === 'كومبو';
             const isSuperCombo = itemName === 'سوبر كومبو';
-            const isHerosMealsTenderSlayerRamenShop = category.trim() === 'Heros Meals - Tender Slayer - Ramen Shop';
             
             let sides = [];
             let flavors = [];
@@ -2639,22 +2488,8 @@ return `
             let superComboCookie = null;
 
             if (isRamen) {
-                if (pendingMealOfferType && pendingMealOfferSelections) {
-                    ramenSoup = pendingMealOfferSelections.ramenSoup;
-                    ramenTopping = pendingMealOfferSelections.ramenTopping;
-                } else {
-                    ramenSoup = document.getElementById('ramen-soup-choice').value;
-                    ramenTopping = document.getElementById('ramen-topping-choice').value;
-                }
-
-                if (pendingMealOfferType === 'combo') {
-                    comboFries = document.getElementById('combo-fries-choice').value;
-                    comboDrink = document.getElementById('combo-drink-choice').value;
-                } else if (pendingMealOfferType === 'super-combo') {
-                    superComboFries = document.getElementById('super-combo-fries-choice').value;
-                    superComboDrink = document.getElementById('super-combo-drink-choice').value;
-                    superComboCookie = document.getElementById('super-combo-cookie-choice').value;
-                }
+                ramenSoup = document.getElementById('ramen-soup-choice').value;
+                ramenTopping = document.getElementById('ramen-topping-choice').value;
             } else if (isSpecificItem) {
                 specificOption = document.getElementById('specific-flavor-choice').value;
             } else if (isCombo) {
@@ -2683,53 +2518,26 @@ return `
                 }
             }
 
-            if (isHerosMealsTenderSlayerRamenShop && !pendingMealOfferType) {
-                pendingMealOfferSelections = {
-                    sides: sides,
-                    flavors: flavors,
-                    ramenSoup: ramenSoup,
-                    ramenTopping: ramenTopping,
-                    specificOption: specificOption
-                };
-                document.getElementById('side-modal').style.display = 'none';
-                openMealComboOffer();
-                return;
-            }
-
             document.getElementById('side-modal').style.display = 'none';
             if (pendingMealItem && pendingClickEvent) {
-                finalizeAddToCart(pendingClickEvent, pendingMealItem, sides, flavors, ramenSoup, ramenTopping, specificOption, comboFries, comboDrink, superComboFries, superComboDrink, superComboCookie, pendingMealOfferType);
+                finalizeAddToCart(pendingClickEvent, pendingMealItem, sides, flavors, ramenSoup, ramenTopping, specificOption, comboFries, comboDrink, superComboFries, superComboDrink, superComboCookie);
             }
             pendingMealItem = null;
             pendingClickEvent = null;
-            pendingMealOfferType = null;
-            pendingMealOfferSelections = null;
         }
 
         function closeSideModal() {
             document.getElementById('side-modal').style.display = 'none';
             pendingMealItem = null;
             pendingClickEvent = null;
-            pendingMealOfferType = null;
-            pendingMealOfferSelections = null;
         }
 
-        function finalizeAddToCart(event, item, sides, flavors, ramenSoup, ramenTopping, specificOption, comboFries, comboDrink, superComboFries, superComboDrink, superComboCookie, mealOfferType = null) {
+        function finalizeAddToCart(event, item, sides, flavors, ramenSoup, ramenTopping, specificOption, comboFries, comboDrink, superComboFries, superComboDrink, superComboCookie) {
             playFlyToCartAnimation(event);
 
             let cartKey = String(item.id || item.name);
             let displayName = item.name;
             let adjustedPrice = parseFloat(item.price || 0);
-
-            if (mealOfferType === 'combo') {
-                adjustedPrice += 55;
-                cartKey += '_meal_combo';
-                displayName += ' (COMBO: Fries + Drink +55 EGP)';
-            } else if (mealOfferType === 'super-combo') {
-                adjustedPrice += 95;
-                cartKey += '_meal_super_combo';
-                displayName += ' (Super Combo: Fries + Drink + Cookie +95 EGP)';
-            }
 
             if (sides && sides.length > 0) {
                 cartKey += `_sides_${sides.join('-')}`;
@@ -2780,8 +2588,7 @@ return `
                     comboDrink: comboDrink,
                     superComboFries: superComboFries,
                     superComboDrink: superComboDrink,
-                    superComboCookie: superComboCookie,
-                    mealOfferType: mealOfferType
+                    superComboCookie: superComboCookie
                 });
             }
             updateCartUI();
