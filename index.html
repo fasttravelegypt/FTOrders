@@ -1036,7 +1036,57 @@ body.lang-ar .offer-description {
     }
 }
 
+/* Opening Hours Banner - under offers slider */
+.order-hours-banner {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 14px;
+    background: linear-gradient(
+        90deg,
+        #170306,
+        #3b080d,
+        #170306
+    );
+    border-bottom: 1px solid rgba(255, 30, 60, 0.45);
+    box-shadow: 0 0 14px rgba(255, 30, 60, 0.12);
+    text-align: center;
+    line-height: 1.35;
+}
 
+.order-hours-ar {
+    display: block;
+    color: #fff;
+    font-family: 'Cairo', sans-serif;
+    font-size: clamp(.72rem, 1.5vw, .9rem);
+    font-weight: 800;
+    direction: rtl;
+}
+
+.order-hours-en {
+    display: block;
+    margin-top: 2px;
+    color: #ddd;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(.65rem, 1.3vw, .82rem);
+    font-weight: 700;
+    letter-spacing: .3px;
+    direction: ltr;
+}
+
+@media (max-width: 600px) {
+    .order-hours-banner {
+        padding: 7px 10px;
+    }
+
+    .order-hours-ar {
+        font-size: .68rem;
+    }
+
+    .order-hours-en {
+        font-size: .62rem;
+        margin-top: 1px;
+    }
+}
 
 </style>
 </head>
@@ -1068,6 +1118,17 @@ body.lang-ar .offer-description {
         <div class="offers-ad-track" id="offers-ad-track"></div>
     </div>
 
+	<!-- Opening Hours Banner -->
+<div class="order-hours-banner">
+    <span class="order-hours-ar">
+        يسعدنا استقبال طلباتكم من الساعة 3 مساء الى الساعة الـ 2 صباحا
+    </span>
+
+    <span class="order-hours-en">
+        We are happy to receive your order from 3pm until 2am
+    </span>
+</div>
+	
     <!-- Main Content Grid -->
     <div class="container">
         
